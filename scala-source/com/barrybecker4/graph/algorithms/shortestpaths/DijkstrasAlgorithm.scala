@@ -29,7 +29,8 @@ class DijkstrasAlgorithm(graph: DirectedGraph) extends ShortestPathsFinder {
 
       val sourceDist = (source, 0.0)
       val sortByWeight: Ordering[(Int, Double)] = (a, b) => a._2.compareTo(b._2)
-      val queue = mutable.PriorityQueue[(Int, Double)](sourceDist)(sortByWeight)
+      val queue = mutable.PriorityQueue.empty[(Int, Double)](using sortByWeight)
+      queue.enqueue(sourceDist)
 
       while (queue.nonEmpty) {
         val (minDestVertex, _) = queue.dequeue()

@@ -2,6 +2,9 @@
 .project
 build/
 bin/
+.metals/
+.vscode/settings.json
+.bloop/
 *.class
 *.log
 .idea

@@ -26,7 +26,7 @@ class YensAlgorithm(graph: DirectedGraph) extends KShortestPathsFinder {
 
     // all results would be put in a priority queue with fixed length
     val sortByWeight: Ordering[Path] = (a, b) => a.weight.compareTo(b.weight)
-    pathCandidates = new BoundedPriorityQueue[Path](k)(sortByWeight)
+    pathCandidates = new BoundedPriorityQueue[Path](k)(using sortByWeight)
 
     pathDerivationNodeIndex.clear()
     searchAll(start, end, k)

@@ -41,7 +41,7 @@ class ModifiedDijkstrasAlgorithm(graph: DirectedGraph) {
   private var determinedVertexSet: Set[Int] = Set()
   private val distanceTo: mutable.Map[Int, Double] = mutable.Map()
   private val vertexCandidateQueue: mutable.PriorityQueue[Int] =
-    mutable.PriorityQueue.empty[Int](Ordering.by(distanceTo).reverse)
+    mutable.PriorityQueue.empty(using Ordering.by(distanceTo).reverse)
   private var predecessorMap: Map[Int, Int] = Map()
 
   def clear(): Unit = {
