@@ -6,6 +6,7 @@ import org.graphstream.graph.Node
 import org.graphstream.ui.spriteManager.Sprite
 import com.barrybecker4.discreteoptimization.traffic.vehicles.VehicleSpriteManager
 
+import scala.compiletime.uninitialized
 import scala.util.Random
 
 
@@ -30,7 +31,7 @@ class VehicleSprite(identifier: String, initialSpeed: Double, manager: VehicleSp
   private var speed = initialSpeed
   private var incrementalDistance: Double = 0
   private var totalDistance: Double = 0
-  private var nextEdge: Edge = _
+  private var nextEdge: Edge = uninitialized
 
   def getSpeed: Double = speed
   def getNextEdge: Edge = nextEdge

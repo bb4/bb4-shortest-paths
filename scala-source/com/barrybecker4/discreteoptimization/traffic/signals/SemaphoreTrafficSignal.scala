@@ -11,6 +11,7 @@ import com.barrybecker4.discreteoptimization.traffic.viewer.TrafficGraphUtil.sle
 import org.graphstream.graph.Node
 
 import scala.annotation.tailrec
+import scala.compiletime.uninitialized
 
 /**
  * A more intelligent traffic light system that uses a semaphore to control the traffic lights.
@@ -25,7 +26,7 @@ import scala.annotation.tailrec
  */
 class SemaphoreTrafficSignal(numStreets: Int) extends TrafficSignal(numStreets) {
   private val lightStates: Array[SignalState] = Array.fill(numStreets)(RED)
-  private var currentSchedule: ScheduledFuture[?] = _
+  private var currentSchedule: ScheduledFuture[?] = uninitialized
   private var streetWithSemaphore: Int = AVAILABLE
   private var lastToBecomeRed: Int = -1
 

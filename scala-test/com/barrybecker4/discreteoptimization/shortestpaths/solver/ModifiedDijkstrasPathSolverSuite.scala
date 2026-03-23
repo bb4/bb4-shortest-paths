@@ -1,6 +1,6 @@
 package com.barrybecker4.discreteoptimization.shortestpaths.solver
 
-import com.barrybecker4.discreteoptimization.shortestpaths.solver.{BaseSolverSuite, ModifiedDijkstrasPathSolver, ShortestPathsSolver}
+import _root_.com.barrybecker4.discreteoptimization.shortestpaths.solver.{BaseSolverSuite, ModifiedDijkstrasPathSolver, ShortestPathsSolver}
 
 class ModifiedDijkstrasPathSolverSuite extends BaseSolverSuite {
 

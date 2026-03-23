@@ -25,7 +25,7 @@ class GraphViewer(thisGraph: Graph) extends SwingViewer(thisGraph, Viewer.Thread
     return view
   }
 
-  override def addDefaultView(openInAFrame: Boolean, renderer: GraphRenderer[_, _]): View =
+  override def addDefaultView(openInAFrame: Boolean, renderer: GraphRenderer[?, ?]): View =
     addDefaultView(openInAFrame)
   
 }

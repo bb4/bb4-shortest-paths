@@ -1,7 +1,5 @@
 package com.barrybecker4.discreteoptimization.traffic
 
-import com.barrybecker4.graph.GraphTstUtil
-import com.barrybecker4.graph.visualization.{GraphStreamAdapter, GraphViewerFrame}
 import com.barrybecker4.discreteoptimization.traffic.viewer.TrafficViewerFrame
 
 
@@ -31,8 +29,11 @@ import com.barrybecker4.discreteoptimization.traffic.viewer.TrafficViewerFrame
  distance | <total dist> |   <inc distance>
  speed    | <avg speed>  |   <current avg speed>
  */
-object TrafficApp extends App {
+object TrafficApp {
 
-  val frame = new TrafficViewerFrame()
+  def main(args: Array[String]): Unit = {
+    new TrafficViewerFrame()
+    ()
+  }
 
 }

@@ -1,15 +1,16 @@
 package com.barrybecker4.discreteoptimization.apps
 
-import com.barrybecker4.graph.Graph
 import com.barrybecker4.graph.algorithms.kshortestpaths.YensAlgorithm
 import com.barrybecker4.graph.directed.{DirectedEdge, DirectedGraph}
 
-object DemoGraphApp extends App {
+object DemoGraphApp {
 
-  val graph = createGraph()
-  val numShortestPaths = 2
-  val kshortestPaths = YensAlgorithm(graph).findKShortestPaths(0, 4, numShortestPaths)
-  println(s"The $numShortestPaths found were:\n" + kshortestPaths)
+  def main(args: Array[String]): Unit = {
+    val graph = createGraph()
+    val numShortestPaths = 2
+    val kshortestPaths = YensAlgorithm(graph).findKShortestPaths(0, 4, numShortestPaths)
+    println(s"The $numShortestPaths found were:\n" + kshortestPaths)
+  }
 
   private def createGraph(): DirectedGraph = {
     val edges = IndexedSeq(

@@ -1,10 +1,10 @@
 package com.barrybecker4.discreteoptimization.kshortestpaths.solver
 
-import com.barrybecker4.graph.{Graph, GraphTstUtil}
-import com.barrybecker4.discreteoptimization.kshortestpaths.model.KShortestPathsSolution
-import com.barrybecker4.discreteoptimization.kshortestpaths.solver.KShortestPathsSolver
-import com.barrybecker4.discreteoptimization.kshortestpaths.KShortedPathsTstUtil
-import com.barrybecker4.discreteoptimization.shortestpaths.ShortedPathsTstUtil
+import _root_.com.barrybecker4.graph.GraphTstUtil
+import _root_.com.barrybecker4.discreteoptimization.kshortestpaths.model.KShortestPathsSolution
+import _root_.com.barrybecker4.discreteoptimization.kshortestpaths.solver.KShortestPathsSolver
+import _root_.com.barrybecker4.discreteoptimization.kshortestpaths.KShortedPathsTstUtil
+import _root_.com.barrybecker4.discreteoptimization.shortestpaths.ShortedPathsTstUtil
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.io.Source

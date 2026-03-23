@@ -6,6 +6,7 @@ import com.barrybecker4.graph.algorithms.shortestpaths.{DijkstrasAlgorithm, Modi
 import com.barrybecker4.graph.directed.DirectedGraph
 import com.barrybecker4.discreteoptimization.shortestpaths.model.ShortestPathsSolution
 
+import scala.compiletime.uninitialized
 import scala.util.Random
 
 
@@ -16,7 +17,7 @@ object ModifiedDijkstrasPathSolver {
 
 class ModifiedDijkstrasPathSolver extends ShortestPathsSolver {
 
-  var graph: DirectedGraph = _
+  var graph: DirectedGraph = uninitialized
 
   /**
    * Find k shortest paths from source

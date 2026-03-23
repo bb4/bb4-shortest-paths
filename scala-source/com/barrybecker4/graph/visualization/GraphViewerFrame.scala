@@ -10,6 +10,7 @@ import org.graphstream.ui.view.{View, Viewer}
 
 import java.io.File
 import javax.swing.*
+import scala.compiletime.uninitialized
 import scala.io.Source
 
 
@@ -24,7 +25,7 @@ class GraphViewerFrame extends JFrame("Graph Viewer") {
   setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE)
   setSize(1000, 900)
 
-  var viewer: GraphViewer = _
+  var viewer: GraphViewer = uninitialized
   createMenu()
 
   setVisible(true)

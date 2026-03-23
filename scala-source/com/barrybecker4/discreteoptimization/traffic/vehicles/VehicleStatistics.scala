@@ -1,11 +1,12 @@
 package com.barrybecker4.discreteoptimization.traffic.vehicles
 
 import scala.collection.immutable.Set
+import scala.compiletime.uninitialized
 
 case class VehicleStatistics(vehicles: Set[VehicleSprite]) {
 
-  private var totalDistance: Double = _
-  private var incrementalDistance: Double = _
+  private var totalDistance: Double = uninitialized
+  private var incrementalDistance: Double = uninitialized
   initialize()
 
   def getTotalDistance: Double = totalDistance

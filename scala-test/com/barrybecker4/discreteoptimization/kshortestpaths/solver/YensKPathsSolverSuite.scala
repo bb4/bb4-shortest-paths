@@ -1,8 +1,8 @@
 package com.barrybecker4.discreteoptimization.kshortestpaths.solver
 
-import com.barrybecker4.graph.algorithms.kshortestpaths.YensAlgorithm
-import com.barrybecker4.discreteoptimization.kshortestpaths.solver.BaseSolverSuite
-import com.barrybecker4.discreteoptimization.kshortestpaths.solver.{KShortestPathsSolver, YensKPathsSolver}
+import _root_.com.barrybecker4.graph.algorithms.kshortestpaths.YensAlgorithm
+import _root_.com.barrybecker4.discreteoptimization.kshortestpaths.solver.BaseSolverSuite
+import _root_.com.barrybecker4.discreteoptimization.kshortestpaths.solver.{KShortestPathsSolver, YensKPathsSolver}
 
 class YensKPathsSolverSuite extends BaseSolverSuite {
 

@@ -7,6 +7,7 @@ import com.barrybecker4.graph.directed.{ChangeableDirectedGraph, DirectedGraph}
 
 import scala.annotation.tailrec
 import scala.collection.mutable
+import scala.compiletime.uninitialized
 
 
 /**
@@ -14,7 +15,7 @@ import scala.collection.mutable
  */
 class YensAlgorithm(graph: DirectedGraph) extends KShortestPathsFinder {
 
-  private var pathCandidates: BoundedPriorityQueue[Path] = _
+  private var pathCandidates: BoundedPriorityQueue[Path] = uninitialized
   private val pathDerivationNodeIndex = mutable.Map[Path, Int]()
   private val paths = mutable.ListBuffer[Path]()
   private val changeableGraph = ChangeableDirectedGraph(graph)

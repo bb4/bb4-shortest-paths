@@ -5,11 +5,12 @@ import org.graphstream.graph.Graph
 import org.graphstream.ui.spriteManager.Sprite
 import com.barrybecker4.discreteoptimization.traffic.vehicles.VehicleSpriteManager
 
+import scala.compiletime.uninitialized
 
 class VehicleSpriteGenerator(private val numSprites: Int, initialSpeed: Double) {
 
   /** The set of sprites. */
-  private var spriteManager: VehicleSpriteManager = _
+  private var spriteManager: VehicleSpriteManager = uninitialized
 
   def getSpriteManager: VehicleSpriteManager = spriteManager
 

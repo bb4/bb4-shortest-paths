@@ -12,6 +12,7 @@ import org.graphstream.ui.geom.Point3
 import com.barrybecker4.discreteoptimization.traffic.viewer.TrafficGraphUtil.{addEdgeLengths, showNodeLabels}
 import com.barrybecker4.discreteoptimization.traffic.viewer.adapter.TrafficStreamAdapter.SHOW_LABELS
 
+import scala.compiletime.uninitialized
 import scala.io.Source
 import scala.util.Using
 
@@ -33,7 +34,7 @@ object TrafficStreamAdapter {
  */
 case class TrafficStreamAdapter(trafficGraph: TrafficGraph) {
 
-  var intersectionSubGraphs: IndexedSeq[IntersectionSubGraph] = _
+  var intersectionSubGraphs: IndexedSeq[IntersectionSubGraph] = uninitialized
   private val isLarge = trafficGraph.intersections.size > LARGE_GRAPH_THRESH
 
   def createGraph(): MultiGraph = {

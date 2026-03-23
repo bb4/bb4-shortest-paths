@@ -1,9 +1,9 @@
 package com.barrybecker4.discreteoptimization.shortestpaths.solver
 
-import com.barrybecker4.graph.{Graph, GraphTstUtil}
-import com.barrybecker4.discreteoptimization.shortestpaths.model.ShortestPathsSolution
-import com.barrybecker4.discreteoptimization.shortestpaths.solver.ShortestPathsSolver
-import com.barrybecker4.discreteoptimization.shortestpaths.ShortedPathsTstUtil
+import _root_.com.barrybecker4.graph.GraphTstUtil
+import _root_.com.barrybecker4.discreteoptimization.shortestpaths.model.ShortestPathsSolution
+import _root_.com.barrybecker4.discreteoptimization.shortestpaths.solver.ShortestPathsSolver
+import _root_.com.barrybecker4.discreteoptimization.shortestpaths.ShortedPathsTstUtil
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.io.Source
