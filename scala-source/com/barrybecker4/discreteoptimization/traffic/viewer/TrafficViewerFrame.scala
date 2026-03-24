@@ -5,11 +5,11 @@ import com.barrybecker4.graph.directed.{DirectedEdge, DirectedGraphParser}
 import TrafficViewerFrame.{PARSER, SUFFIX, TRAFFIC_GRAPHS_PREFIX}
 import com.barrybecker4.graph.visualization.render.GraphViewerPipe
 import com.barrybecker4.graph.visualization.{GraphStreamAdapter, GraphViewer, GraphViewerFrame}
-import com.barrybecker4.discreteoptimization.kshortestpaths.KShortedPathsTstUtil
+import com.barrybecker4.discreteoptimization.kshortestpaths.KShortestPathsTstUtil
 import com.barrybecker4.discreteoptimization.kshortestpaths.model.KShortestPathsSolution
 import com.barrybecker4.discreteoptimization.kshortestpaths.solver.YensKPathsSolver
 import com.barrybecker4.discreteoptimization.pathviewer.PathViewerFrame.*
-import com.barrybecker4.discreteoptimization.shortestpaths.ShortedPathsTstUtil
+import com.barrybecker4.discreteoptimization.shortestpaths.ShortestPathsTstUtil
 import com.barrybecker4.discreteoptimization.shortestpaths.model.ShortestPathsSolution
 import com.barrybecker4.discreteoptimization.shortestpaths.solver.{DijkstrasPathSolver, ModifiedDijkstrasPathSolver}
 import com.barrybecker4.discreteoptimization.traffic.demo.TrafficOrchestrator

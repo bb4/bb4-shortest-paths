@@ -65,7 +65,7 @@ class VehiclePlacer(private val sprites: VehicleSpriteManager, private val graph
    */
   private def determineNumVehiclesOnEdges = {
     val numVehicles = sprites.getSpriteCount
-    val totalLen = findTotaLengthOfAllEdges(graph)
+    val totalLen = findTotalLengthOfAllEdges(graph)
     var edgeIdToNumVehicles: Map[String, Integer] = createInitialEdgeAllocations(numVehicles, totalLen)
     edgeIdToNumVehicles = fineTuneEdgeAllocations(edgeIdToNumVehicles, numVehicles)
 
@@ -147,9 +147,7 @@ class VehiclePlacer(private val sprites: VehicleSpriteManager, private val graph
     assert(numVehiclesToAdd <= spriteSlots.length)
     System.out.println("now adding " + numVehiclesToAdd + " vehicles to edge " + edge.getId + " total avail slots = " + spriteSlots.length + " with maxAllocation=" + maxAllocation);
     for (i <- 0 until numVehiclesToAdd) {
-      var positionIdx = RND.nextInt(spriteSlots.length)
-      while (spriteSlots(positionIdx) != null)
-        positionIdx = (positionIdx + 1) % spriteSlots.length
+      val positionIdx = chooseOpenSlotIndex(spriteSlots)
       val sprite = sprites.addSprite(s"${spriteCount.get()}")
       val color = VehiclePlacer.VEHICLE_COLORS(RND.nextInt(VehiclePlacer.VEHICLE_COLORS.length))
       sprite.setAttribute("ui.style", s"fill-color: $color")
@@ -163,7 +161,14 @@ class VehiclePlacer(private val sprites: VehicleSpriteManager, private val graph
     }
   }
 
-  private def findTotaLengthOfAllEdges(graph: Graph) = streetEdges.stream().mapToDouble(e => getEdgeLen(e)).toArray.sum
+  private def chooseOpenSlotIndex(spriteSlots: Array[Sprite]): Int = {
+    var positionIdx = RND.nextInt(spriteSlots.length)
+    while (spriteSlots(positionIdx) != null)
+      positionIdx = (positionIdx + 1) % spriteSlots.length
+    positionIdx
+  }
+
+  private def findTotalLengthOfAllEdges(graph: Graph) = streetEdges.stream().mapToDouble(e => getEdgeLen(e)).toArray.sum
 
   private def getMaxAllocation(edge: Edge) = edge.getAttribute("maxAllocation", classOf[Object]).asInstanceOf[Integer]
 

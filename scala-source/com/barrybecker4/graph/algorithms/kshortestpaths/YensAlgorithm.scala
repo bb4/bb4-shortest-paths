@@ -51,8 +51,7 @@ class YensAlgorithm(graph: DirectedGraph) extends KShortestPathsFinder {
 
       val nextDerivedNodeIdx = removeEdgesAndNodes(nextPath) // 1. remove the edges and nodes from the graph
 
-      // Why is it a million times faster if we skip this step????????????????????????
-      identifyNewCandidateResults(nextPath, nextDerivedNodeIdx, end) // 2. recover from the ending, and calculate a few more candidates
+      identifyNewCandidateResults(nextPath, nextDerivedNodeIdx, end) // 2. deviation paths in the residual graph (Yen's step)
 
       paths += nextPath // 3. recover all and update the result list
       changeableGraph.recover()
@@ -83,44 +82,51 @@ class YensAlgorithm(graph: DirectedGraph) extends KShortestPathsFinder {
   }
 
   private def identifyNewCandidateResults(nextPath: Path, nextDerivedNodeIdx: Int, end: Int): Unit = {
-    // 2.1 calculate the shortest tree rooted at target vertex in the graph
-    val findShortestPath = new ModifiedDijkstrasAlgorithm(changeableGraph)
-    findShortestPath.findShortestPathFlowerRootAt(end)
+    val dijkstra = new ModifiedDijkstrasAlgorithm(changeableGraph)
+    dijkstra.findShortestPathFlowerRootAt(end)
 
-    // 2.2 recover the deleted vertices and update the cost and identify the new candidate results
     for (nodeSeq <- nextPath.nodes.size - 2 to nextDerivedNodeIdx by -1 if nodeSeq >= 0) {
-      val recoveredNode = nextPath.nodes(nodeSeq)
-      changeableGraph.recover(recoveredNode)
+      processDeviationAtNode(nextPath, nodeSeq, dijkstra)
+    }
+  }
 
-      findShortestPath.getSubShortestPath(recoveredNode) match {
-        case None =>
-        case Some(subPath) =>
-          findShortestPath.correctCostBackward(recoveredNode)
-          val prefix = nextPath.nodes.dropRight(nextPath.nodes.size - nodeSeq - 1)
-          var cost = 0.0
-          for (i <- 0 until prefix.size - 1) {
-            cost += changeableGraph.findOrigEdge(prefix(i), prefix(1 + i)).weight
-          }
-          val newPath: Path = Path(cost + subPath.weight, prefix.dropRight(1) ::: subPath.nodes)
+  /** Sum of weights along consecutive pairs in `nodeList` (empty if fewer than two nodes). */
+  private def pathEdgeWeight(nodeList: List[Int]): Double =
+    nodeList.zip(nodeList.tail).map { case (a, b) => changeableGraph.findOrigEdge(a, b).weight }.sum
 
-          if (!pathDerivationNodeIndex.contains(newPath)) {
-            pathDerivationNodeIndex.put(newPath, recoveredNode)
-            pathCandidates += newPath
-          }
-      }
+  private def enqueueCandidateIfNew(path: Path, derivationNode: Int): Unit =
+    if (!pathDerivationNodeIndex.contains(path)) {
+      pathDerivationNodeIndex.put(path, derivationNode)
+      pathCandidates += path
+    }
 
-      // 2.3 recover edges
-      val nextNode = nextPath.nodes(nodeSeq + 1)
-      changeableGraph.recover(recoveredNode, nextNode)
+  private def processDeviationAtNode(
+      nextPath: Path,
+      nodeSeq: Int,
+      findShortestPath: ModifiedDijkstrasAlgorithm
+  ): Unit = {
+    val recoveredNode = nextPath.nodes(nodeSeq)
+    changeableGraph.recover(recoveredNode)
 
-      // 2.4 update cost if necessary
-      val newCost = changeableGraph.findOrigEdge(recoveredNode, nextNode).weight +
-        findShortestPath.getStartVertexDistance(nextNode)
-      if (findShortestPath.getStartVertexDistance(recoveredNode) > newCost && newCost < Double.MaxValue) {
-        findShortestPath.setStartVertexDistance(recoveredNode, newCost)
-        findShortestPath.setPredecessor(recoveredNode, nextNode)
+    findShortestPath.getSubShortestPath(recoveredNode) match {
+      case None =>
+      case Some(subPath) =>
         findShortestPath.correctCostBackward(recoveredNode)
-      }
+        val prefix = nextPath.nodes.dropRight(nextPath.nodes.size - nodeSeq - 1)
+        val cost = pathEdgeWeight(prefix)
+        val newPath = Path(cost + subPath.weight, prefix.dropRight(1) ::: subPath.nodes)
+        enqueueCandidateIfNew(newPath, recoveredNode)
+    }
+
+    val nextNode = nextPath.nodes(nodeSeq + 1)
+    changeableGraph.recover(recoveredNode, nextNode)
+
+    val newCost = changeableGraph.findOrigEdge(recoveredNode, nextNode).weight +
+      findShortestPath.getStartVertexDistance(nextNode)
+    if (findShortestPath.getStartVertexDistance(recoveredNode) > newCost && newCost < Double.MaxValue) {
+      findShortestPath.setStartVertexDistance(recoveredNode, newCost)
+      findShortestPath.setPredecessor(recoveredNode, nextNode)
+      findShortestPath.correctCostBackward(recoveredNode)
     }
   }
 }

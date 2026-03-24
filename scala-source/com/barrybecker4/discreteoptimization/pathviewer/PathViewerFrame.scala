@@ -3,13 +3,13 @@ package com.barrybecker4.discreteoptimization.pathviewer
 import com.barrybecker4.graph.Path
 import com.barrybecker4.graph.directed.{DirectedEdge, DirectedGraphParser}
 import com.barrybecker4.graph.visualization.{GraphStreamAdapter, GraphViewer, GraphViewerFrame}
-import com.barrybecker4.discreteoptimization.kshortestpaths.KShortedPathsTstUtil
+import com.barrybecker4.discreteoptimization.kshortestpaths.KShortestPathsTstUtil
 import com.barrybecker4.discreteoptimization.kshortestpaths.model.KShortestPathsSolution
 import com.barrybecker4.discreteoptimization.kshortestpaths.solver.YensKPathsSolver
 import com.barrybecker4.discreteoptimization.pathviewer.PathViewerFrame.{K_SHORTEST_PATHS_PREFIX, SHORTEST_PATHS_PREFIX}
 import com.barrybecker4.discreteoptimization.pathviewer.render.ShortestPathRenderer
 import com.barrybecker4.discreteoptimization.pathviewer.render.KShortestPathRenderer
-import com.barrybecker4.discreteoptimization.shortestpaths.ShortedPathsTstUtil
+import com.barrybecker4.discreteoptimization.shortestpaths.ShortestPathsTstUtil
 import com.barrybecker4.discreteoptimization.shortestpaths.model.ShortestPathsSolution
 import com.barrybecker4.discreteoptimization.pathviewer.PathViewerFrame.*
 import com.barrybecker4.discreteoptimization.pathviewer.render.{GraphViewerListener, PathRenderer}
@@ -69,7 +69,7 @@ class PathViewerFrame extends GraphViewerFrame() {
       println("selected file is " + selectedFile.getName)
 
       val graph = loadTheGraph(selectedFile)
-      val solution = ShortedPathsTstUtil.getSolution(selectedFile.getName)
+      val solution = ShortestPathsTstUtil.getSolution(selectedFile.getName)
 
       // then load the shortest paths
       showShortestPaths(solution, graph)
@@ -86,7 +86,7 @@ class PathViewerFrame extends GraphViewerFrame() {
       println("selected file is " + selectedFile.getName)
 
       val graph = loadTheGraph(selectedFile)
-      val solution = KShortedPathsTstUtil.getSolution(selectedFile.getName)
+      val solution = KShortestPathsTstUtil.getSolution(selectedFile.getName)
 
       // then load the shortest paths
       showKShortestPaths(solution, graph)

@@ -1,12 +1,11 @@
 package com.barrybecker4.discreteoptimization.kshortestpaths
 
-import com.barrybecker4.graph.directed.DirectedGraph
 import com.barrybecker4.discreteoptimization.kshortestpaths.model.{KShortestPathsSolution, KShortestPathsSolutionParser}
 
 import java.io.{File, PrintWriter}
 import scala.io.Source
 
-object KShortedPathsTstUtil {
+object KShortestPathsTstUtil {
 
   val PREFIX = "scala-test/com/barrybecker4/discreteoptimization/kshortestpaths/solver/data/"
 
@@ -16,7 +15,7 @@ object KShortedPathsTstUtil {
     source.close()
     s
   }
-  
+
   def getSolution(name: String): KShortestPathsSolution = {
     val source: Source = Source.fromFile(PREFIX + name)
     KShortestPathsSolutionParser().parse(source.getLines().toIndexedSeq)
@@ -27,4 +26,9 @@ object KShortedPathsTstUtil {
     pw.write(text)
     pw.close()
   }
+}
+
+@deprecated("Use KShortestPathsTstUtil", since = "2.0")
+object KShortedPathsTstUtil {
+  export KShortestPathsTstUtil.{getSerializedSolution, getSolution, writeSolution, PREFIX}
 }

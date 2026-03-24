@@ -1,7 +1,5 @@
 package com.barrybecker4.graph
 
-import com.barrybecker4.graph.{Edge, NeighborMap}
-
 import scala.collection.immutable.{Map, Set}
 
 

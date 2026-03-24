@@ -49,26 +49,29 @@ class SemaphoreTrafficSignal(numStreets: Int) extends TrafficSignal(numStreets) 
         assert(lightState == RED, "The light state was unexpectedly " + lightState)
         trySwitchingToGreen(portId, sortedVehicles, edgeLen)
       case `portId` =>
-        assert(lightState != RED, "The light state was unexpectedly " + lightState)
-        if (areCarsComing(sortedVehicles, edgeLen)) {
-          // already have it, stay yellow or green, unless we are headed for a jammed street
-          // check if the last car is headed for a jammed street. If so, turn yellow.
-          val lastCar = sortedVehicles.last
-          val isJammed = isNextStreetJammed(lastCar)
-          if (isJammed && lightState == GREEN) {
-            println("Next street is jammed, so switching to yellow")
-            switchToYellow(portId, sortedVehicles, edgeLen)
-          }
-        } else if (currentSchedule != null && lightState == GREEN) {
-          // No cars are coming, so give up the semaphore
-          println("No cars coming on street " + portId + " so canceling schedule and switching to red")
-          currentSchedule.cancel(true)
-          currentSchedule = null
-          switchToRed(portId)
-        }
+        handleStreetHoldingSemaphore(portId, sortedVehicles, edgeLen, lightState)
       case _ =>
-        // do nothing. Some other street has the semaphore
-        //println("different street has the semaphore = " + streetWithSemaphore + " port=" + portId + " lightState=" + lightState)
+    }
+  }
+
+  private def handleStreetHoldingSemaphore(
+      portId: Int,
+      sortedVehicles: IndexedSeq[VehicleSprite],
+      edgeLen: Double,
+      lightState: SignalState
+  ): Unit = {
+    assert(lightState != RED, "The light state was unexpectedly " + lightState)
+    if (areCarsComing(sortedVehicles, edgeLen)) {
+      val lastCar = sortedVehicles.last
+      if (isNextStreetJammed(lastCar) && lightState == GREEN) {
+        println("Next street is jammed, so switching to yellow")
+        switchToYellow(portId, sortedVehicles, edgeLen)
+      }
+    } else if (currentSchedule != null && lightState == GREEN) {
+      println("No cars coming on street " + portId + " so canceling schedule and switching to red")
+      currentSchedule.cancel(true)
+      currentSchedule = null
+      switchToRed(portId)
     }
   }
 

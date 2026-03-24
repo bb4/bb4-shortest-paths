@@ -5,7 +5,7 @@ import com.barrybecker4.graph.directed.{DirectedEdge, DirectedGraph}
 
 import scala.annotation.tailrec
 import scala.collection.mutable
-import scala.collection.mutable.{ArrayBuffer, PriorityQueue}
+import scala.collection.mutable.PriorityQueue
 
 
 /**
@@ -176,15 +176,5 @@ class ModifiedDijkstrasAlgorithm(graph: DirectedGraph) {
       case Double.MaxValue => None
       case cost => Some(Path(cost, getReversePath(source, List())))
     }
-  }
-
-  private def serializeQueue(): String = {
-    val clonedQueue = vertexCandidateQueue.clone()
-    var s = "sorted queue: "
-    while (clonedQueue.nonEmpty) {
-      val value = clonedQueue.dequeue()
-      s += s"$value(${distanceTo(value)}) "
-    }
-    s
   }
 }

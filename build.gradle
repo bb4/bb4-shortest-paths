@@ -13,9 +13,13 @@ bb4 {
     mainClass.set('com.barrybecker4.discreteoptimization.pathviewer.PathViewerApp')
 }
 
+test {
+    systemProperty 'shortestpaths.updateFixtures',
+        System.getProperty('shortestpaths.updateFixtures', 'false')
+}
+
 dependencies {
     implementation 'com.barrybecker4:bb4-common:2.0-SNAPSHOT'
-    implementation 'org.scala-lang.modules:scala-parallel-collections_3:1.0.4'
     implementation 'com.barrybecker4:bb4-math:2.0-SNAPSHOT'
     // for graph visualization
     implementation 'org.graphstream:gs-core:2.0'

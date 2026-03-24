@@ -1,8 +1,9 @@
 package com.barrybecker4.graph.directed
 
-import com.barrybecker4.graph.directed.{DirectedEdge, DirectedGraph}
 import com.barrybecker4.common.geometry.FloatLocation
 import com.barrybecker4.graph.Parser
+
+import scala.collection.mutable.ArrayBuffer
 
 
 case class DirectedGraphParser() extends Parser[DirectedGraph] {
@@ -36,28 +37,28 @@ case class DirectedGraphParser() extends Parser[DirectedGraph] {
   }
 
   /**
-   * Warn if there are eny duplicate edges. Normally, there should not be.
+   * Warn if there are any duplicate edges. Normally, there should not be.
    * Just warn the first time to avoid too many warnings.
    */
   private def parseEdges(start: Int, numEdges: Int, lines: IndexedSeq[String]): IndexedSeq[DirectedEdge] = {
-    var edges = IndexedSeq[DirectedEdge]()
+    val edges = ArrayBuffer[DirectedEdge]()
     var edgeSet: Set[(Int, Int)] = Set()
     for (i <- 0 until numEdges) {
       val line = lines(i + start)
       val parts = line.split("\\s+")
-      // if no weight specified, use a random one
-      val weight = if (parts.length > 2) parts(2).toDouble else 1 + Math.random()
+      // if no weight specified, use a deterministic default (stable for tests and reproducibility)
+      val weight = if (parts.length > 2) parts(2).toDouble else 1.0
       val source = parts(0).toInt
       val dest = parts(1).toInt
       val e = (source, dest)
-      
+
       if (edgeSet.contains(e)) {
         println(s"More than one edge from ${e._1} to ${e._2}. This is allowed, but may not be what you want.")
-      } else edgeSet += (source, dest)
-      
-      edges :+= DirectedEdge(source, dest, weight)
+      } else edgeSet = edgeSet + e
+
+      edges += DirectedEdge(source, dest, weight)
     }
-    edges
+    edges.toIndexedSeq
   }
 }
 

@@ -6,7 +6,7 @@ import com.barrybecker4.discreteoptimization.shortestpaths.model.{ShortestPathsS
 import java.io.{File, PrintWriter}
 import scala.io.Source
 
-object ShortedPathsTstUtil {
+object ShortestPathsTstUtil {
 
   val PREFIX = "scala-test/com/barrybecker4/discreteoptimization/shortestpaths/solver/data/"
   val PARSER: DirectedGraphParser = DirectedGraphParser()
@@ -28,4 +28,9 @@ object ShortedPathsTstUtil {
     pw.write(text)
     pw.close()
   }
+}
+
+@deprecated("Use ShortestPathsTstUtil", since = "2.0")
+object ShortedPathsTstUtil {
+  export ShortestPathsTstUtil.{getSerializedSolution, getSolution, writeSolution, PREFIX, PARSER}
 }

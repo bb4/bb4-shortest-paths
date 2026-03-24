@@ -1,13 +1,10 @@
 package com.barrybecker4.discreteoptimization.shortestpaths.solver
 
+import _root_.com.barrybecker4.discreteoptimization.FixtureUpdateMode
 import _root_.com.barrybecker4.graph.GraphTstUtil
-import _root_.com.barrybecker4.discreteoptimization.shortestpaths.model.ShortestPathsSolution
+import _root_.com.barrybecker4.discreteoptimization.shortestpaths.ShortestPathsTstUtil
 import _root_.com.barrybecker4.discreteoptimization.shortestpaths.solver.ShortestPathsSolver
-import _root_.com.barrybecker4.discreteoptimization.shortestpaths.ShortedPathsTstUtil
 import org.scalatest.funsuite.AnyFunSuite
-
-import scala.io.Source
-import scala.util.Random
 
 
 abstract class BaseSolverSuite extends AnyFunSuite {
@@ -16,18 +13,20 @@ abstract class BaseSolverSuite extends AnyFunSuite {
 
   def solverName(): String
 
-  def verify(problemName: String, update: Boolean): Unit = {
+  /** Set JVM `-Dshortestpaths.updateFixtures=true` or env `SHORTEST_PATHS_UPDATE_FIXTURES=true` to rewrite golden files. */
+  protected def updateFixtures: Boolean = FixtureUpdateMode.updateFixtures
+
+  def verify(problemName: String): Unit = {
     print(s"running $problemName ...")
     val graph = GraphTstUtil.getGraph(problemName)
- 
-    val actual: ShortestPathsSolution = createSolver().findPaths(graph)
+
+    val actual = createSolver().findPaths(graph)
     val fileName = getFileName(problemName)
 
-    if (update) {
-      ShortedPathsTstUtil.writeSolution(fileName, actual.toString)
-    }
-    else {
-      val expSolution = ShortedPathsTstUtil.getSerializedSolution(fileName)
+    if (updateFixtures) {
+      ShortestPathsTstUtil.writeSolution(fileName, actual.toString)
+    } else {
+      val expSolution = ShortestPathsTstUtil.getSerializedSolution(fileName)
       assertResult(expSolution, "actual:\n" + actual) {
         actual.toString() + "\n"
       }

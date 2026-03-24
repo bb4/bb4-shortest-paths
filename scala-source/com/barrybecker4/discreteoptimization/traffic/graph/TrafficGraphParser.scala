@@ -2,9 +2,10 @@ package com.barrybecker4.discreteoptimization.traffic.graph
 
 import com.barrybecker4.common.geometry.FloatLocation
 import com.barrybecker4.graph.Parser
-import com.barrybecker4.discreteoptimization.traffic.graph.TrafficGraph
 import com.barrybecker4.discreteoptimization.traffic.graph.model.{Intersection, Port, Street}
 import com.barrybecker4.discreteoptimization.traffic.signals.TrafficSignalType
+
+import scala.collection.mutable.ArrayBuffer
 
 
 /**
@@ -37,7 +38,7 @@ case class TrafficGraphParser() extends Parser[TrafficGraph] {
   }
 
   private def parseIntersections(numIntersections: Int, lines: IndexedSeq[String]): IndexedSeq[Intersection] = {
-    var intersections = IndexedSeq[Intersection]()
+    val intersections = ArrayBuffer[Intersection]()
     for (i <- 0 until numIntersections) {
       val line = lines(i + 1)
       val parts = line.split("\\s+")
@@ -46,10 +47,10 @@ case class TrafficGraphParser() extends Parser[TrafficGraph] {
       val numPorts = (parts.length - 3) / 2
       val ports: IndexedSeq[Port] = for (j <- 0 until numPorts; idx = 3 + j * 2)
         yield Port(j, parts(idx).toDouble, parts(idx + 1).toInt)
-      
-      intersections :+= Intersection(i, location, ports, signalType)
+
+      intersections += Intersection(i, location, ports, signalType)
     }
-    intersections
+    intersections.toIndexedSeq
   }
 
   /**
@@ -58,7 +59,7 @@ case class TrafficGraphParser() extends Parser[TrafficGraph] {
    * intersectionId_i1 port_i intersectionId_j1 port_j
    */
   private def parseStreets(start: Int, numStreets: Int, lines: IndexedSeq[String]): IndexedSeq[Street] = {
-    var streets = IndexedSeq[Street]()
+    val streets = ArrayBuffer[Street]()
     var portSet: Set[(Int, Int)] = Set()
     for (i <- 0 until numStreets) {
       val line = lines(i + start)
@@ -72,9 +73,9 @@ case class TrafficGraphParser() extends Parser[TrafficGraph] {
       portSet = addNodePortIfAvailable(intersectionIdx1, port1, portSet)
       portSet = addNodePortIfAvailable(intersectionIdx2, port2, portSet)
 
-      streets :+= Street(intersectionIdx1, port1, intersectionIdx2, port2)
+      streets += Street(intersectionIdx1, port1, intersectionIdx2, port2)
     }
-    streets
+    streets.toIndexedSeq
   }
 
   private def addNodePortIfAvailable(intersectionIdx: Int, portIdx: Int, nodePortSet: Set[(Int, Int)]): Set[(Int, Int)] = {
