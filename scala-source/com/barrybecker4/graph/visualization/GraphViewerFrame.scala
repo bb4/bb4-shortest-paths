@@ -1,5 +1,6 @@
 package com.barrybecker4.graph.visualization
 
+import com.barrybecker4.graph.GraphTstUtil
 import com.barrybecker4.graph.directed.{DirectedGraph, DirectedGraphParser}
 import com.barrybecker4.graph.visualization.GraphViewerFrame.{PARSER, PREFIX}
 import com.barrybecker4.graph.visualization.{GraphStreamAdapter, GraphViewer}
@@ -15,7 +16,7 @@ import scala.io.Source
 
 
 object GraphViewerFrame {
-  private val PREFIX = "scala-test/com/barrybecker4/discreteoptimization/common/graph/data/"
+  private val PREFIX = GraphTstUtil.PREFIX
   private val PARSER: DirectedGraphParser = DirectedGraphParser()
 }
 

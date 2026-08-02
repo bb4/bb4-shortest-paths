@@ -12,7 +12,7 @@ import scala.util.Using
 
 object GraphStreamAdapter {
   val LARGE_GRAPH_THRESH = 300
-  private val STYLE_SHEET_PATH = "scala-source/com/barrybecker4/discreteoptimization/common/graph/visualization/graph.css"
+  private val STYLE_SHEET_PATH = "scala-source/com/barrybecker4/graph/visualization/graph.css"
 
   private def loadStyleSheet(): String = {
     Using(Source.fromFile(STYLE_SHEET_PATH)) { source => source.mkString }

@@ -27,7 +27,7 @@ object LeHavreMap {
       |edge.tunnel { stroke-color: blue; stroke-width: 1px; stroke-mode: plain; }
       |edge.bridge { stroke-color: yellow; stroke-width: 1px; stroke-mode: plain; }
       |""".stripMargin
-  private val PATH_PREFIX = "scala-source/com/barrybecker4/discreteoptimization/common/graph/visualization/demos/"
+  private val PATH_PREFIX = "scala-source/com/barrybecker4/graph/visualization/demos/"
 
   def main(args: Array[String]): Unit = {
     System.setProperty("org.graphstream.ui", "swing")
