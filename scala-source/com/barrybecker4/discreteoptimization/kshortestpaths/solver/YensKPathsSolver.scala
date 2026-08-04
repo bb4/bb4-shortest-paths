@@ -1,13 +1,9 @@
 package com.barrybecker4.discreteoptimization.kshortestpaths.solver
 
-import com.barrybecker4.common.format.FormatUtil
-import com.barrybecker4.graph.algorithms.kshortestpaths.{KShortestPathsFinder, YensAlgorithm}
-import com.barrybecker4.graph.{Graph, Path}
+import com.barrybecker4.graph.algorithms.kshortestpaths.YensAlgorithm
+import com.barrybecker4.graph.Path
 import com.barrybecker4.graph.directed.DirectedGraph
 import com.barrybecker4.discreteoptimization.kshortestpaths.model.KShortestPathsSolution
-import com.barrybecker4.discreteoptimization.kshortestpaths.solver.YensKPathsSolver
-
-import scala.util.Random
 
 
 object YensKPathsSolver {

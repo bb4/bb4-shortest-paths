@@ -1,13 +1,10 @@
 package com.barrybecker4.discreteoptimization.shortestpaths.solver
 
-import com.barrybecker4.common.format.FormatUtil
 import com.barrybecker4.graph.algorithms.shortestpaths.DijkstrasAlgorithm
-import com.barrybecker4.graph.{Graph, Path}
 import com.barrybecker4.graph.directed.DirectedGraph
 import com.barrybecker4.discreteoptimization.shortestpaths.model.ShortestPathsSolution
 
 import scala.compiletime.uninitialized
-import scala.util.Random
 
 object DijkstrasPathSolver {
   val BASE_NAME = "dijkstra"
