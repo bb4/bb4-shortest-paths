@@ -14,27 +14,19 @@ case class DirectedGraphParser() extends Parser[DirectedGraph] {
     val numEdges = firstLine(1).toInt
     val hasLocations = firstLine(2).toBoolean
 
-    var locations: Option[Array[FloatLocation]] = None
-    if (hasLocations) {
-      locations = Some(parseLocations(numVertices, lines))
-    }
+    val locations =
+      if (hasLocations) Some(parseLocations(numVertices, lines)) else None
     val start = if (hasLocations) 1 + numVertices else 1
     val edges = parseEdges(start, numEdges, lines)
 
     DirectedGraph(numVertices, edges, locations)
   }
 
-  private def parseLocations(numVertices: Int, lines: IndexedSeq[String]): Array[FloatLocation] = {
-    val theLocations: Array[FloatLocation] = Array.fill(numVertices)(null)
-    var start = 1
-    for (i <- 0 until numVertices) {
-      val line = lines(i + start)
-      val parts = line.split("\\s+")
-      theLocations(i) = FloatLocation(parts(0).toFloat, parts(1).toFloat)
+  private def parseLocations(numVertices: Int, lines: IndexedSeq[String]): Array[FloatLocation] =
+    Array.tabulate(numVertices) { i =>
+      val parts = lines(i + 1).split("\\s+")
+      FloatLocation(parts(0).toFloat, parts(1).toFloat)
     }
-    start += numVertices
-    theLocations
-  }
 
   /**
    * Warn if there are any duplicate edges. Normally, there should not be.
@@ -61,4 +53,3 @@ case class DirectedGraphParser() extends Parser[DirectedGraph] {
     edges.toIndexedSeq
   }
 }
-
