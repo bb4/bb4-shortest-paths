@@ -4,12 +4,10 @@ import com.barrybecker4.graph.Path
 import com.barrybecker4.graph.visualization.GraphViewer
 import com.barrybecker4.graph.visualization.render.UiClass
 import com.barrybecker4.discreteoptimization.kshortestpaths.model.KShortestPathsSolution
-import com.barrybecker4.discreteoptimization.pathviewer.render.PathRenderer.{ANIMATION_DELAY, PAUSE}
+import com.barrybecker4.discreteoptimization.pathviewer.render.PathRenderer.ANIMATION_DELAY
 import com.barrybecker4.discreteoptimization.pathviewer.render.PathColors.*
 import com.barrybecker4.graph.visualization.render.UiClass.*
 import org.graphstream.graph.implementations.MultiGraph
-import org.graphstream.graph.{Edge, Node}
-import org.graphstream.ui.view.ViewerPipe
 
 import java.awt.Color
 
@@ -48,53 +46,32 @@ case class KShortestPathRenderer(graph: MultiGraph, solution: KShortestPathsSolu
     }
   }
 
-  def colorPath(path: Path, uiClass: UiClass, animationDelay: Int = ANIMATION_DELAY, color: Option[Color] = None): Unit = {
-
-    if (path.nodes.size > 1) {
-      var prevNode: Node = null
-      var nextNode: Node = null
-      val lastNodeIdx = path.lastNode
-
-      for (nodeIdx <- path.nodes) {
-        val nextNode = graph.getNode(nodeIdx)
-        val leavingEdge: Edge =
-          if (prevNode != null) prevNode.leavingEdges().filter(e => e.getNode1 == nextNode).findFirst().get()
-          else null
-        if (nodeIdx == lastNodeIdx && uiClass.isHighlight)
-          nextNode.setAttribute("ui.class", "last")
-        else
-          nextNode.setAttribute("ui.class", uiClass.name)
-
-        if (leavingEdge != null) {
-          leavingEdge.setAttribute("ui.class", uiClass.name)
-          if (color.isDefined) {
-            val c = colorToCss(color.get)
-            leavingEdge.setAttribute("ui.style", s"fill-color: $c; size: 3;")
-          } else {
-            leavingEdge.setAttribute("ui.style", "size: 2;")
-          }
-        }
-        prevNode = nextNode
-        if (animationDelay > 0) {
-          viewerPipe.pump()
-          Thread.sleep(animationDelay)
-        }
+  def colorPath(path: Path, uiClass: UiClass, animationDelay: Int = ANIMATION_DELAY, color: Option[Color] = None): Unit =
+    walkPath(path, animationDelay) { (node, _, isLast) =>
+      if (isLast && uiClass.isHighlight)
+        node.setAttribute("ui.class", "last")
+      else
+        node.setAttribute("ui.class", uiClass.name)
+    } { edge =>
+      edge.setAttribute("ui.class", uiClass.name)
+      if (color.isDefined) {
+        val c = colorToCss(color.get)
+        edge.setAttribute("ui.style", s"fill-color: $c; size: 3;")
+      } else {
+        edge.setAttribute("ui.style", "size: 2;")
       }
-      if (animationDelay == 0) viewerPipe.pump()
     }
-  }
 
   // Get all the paths that pass through nodeIdx
   private def getPathIndices(nodeIdx: Int): Seq[Int] =
-    solution.shortestPaths.zipWithIndex.filter((path, idx) => path.containsNode(nodeIdx)).map(_._2)
+    solution.shortestPaths.zipWithIndex.filter((path, _) => path.containsNode(nodeIdx)).map(_._2)
 
 
-  private def getPathIndices(nodeIdx1: Int, nodeIdx2: Int): Seq[Int] = {
-    solution.shortestPaths.zipWithIndex.filter((path, idx) => {
+  private def getPathIndices(nodeIdx1: Int, nodeIdx2: Int): Seq[Int] =
+    solution.shortestPaths.zipWithIndex.filter { (path, _) =>
       val nodes = path.nodes
       val containsBoth = path.containsNode(nodeIdx1) && path.containsNode(nodeIdx2)
       containsBoth && (Math.abs(nodes.indexOf(nodeIdx2) - nodes.indexOf(nodeIdx1)) == 1)
-    }).map(_._2)
-  }
+    }.map(_._2)
 
 }
