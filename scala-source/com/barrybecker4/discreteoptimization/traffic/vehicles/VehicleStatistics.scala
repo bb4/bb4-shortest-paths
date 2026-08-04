@@ -1,26 +1,13 @@
 package com.barrybecker4.discreteoptimization.traffic.vehicles
 
-import scala.collection.immutable.Set
-import scala.compiletime.uninitialized
-
 case class VehicleStatistics(vehicles: Set[VehicleSprite]) {
 
-  private var totalDistance: Double = uninitialized
-  private var incrementalDistance: Double = uninitialized
-  initialize()
+  private val totalDistance: Double = vehicles.iterator.map(_.getTotalDistance).sum
+  private val incrementalDistance: Double = vehicles.iterator.map(_.getIncrementalDistance).sum
 
   def getTotalDistance: Double = totalDistance
   def getIncrementalDistance: Double = incrementalDistance
-  def resetIncrementalDistance(): Unit = {
-    for (vehicle <- vehicles) {
-      vehicle.resetIncrementalDistance()
-    }
-  }
 
-  private def initialize(): Unit = {
-    for (vehicle <- vehicles) {
-      totalDistance += vehicle.getTotalDistance
-      incrementalDistance += vehicle.getIncrementalDistance
-    }
-  }
+  def resetIncrementalDistance(): Unit =
+    vehicles.foreach(_.resetIncrementalDistance())
 }
