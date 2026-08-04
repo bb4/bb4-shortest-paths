@@ -2,17 +2,11 @@ package com.barrybecker4.discreteoptimization.traffic.viewer
 
 import TrafficGraphGenerator.loadStyleSheet
 import org.graphstream.graph.Edge
-import org.graphstream.graph.Graph
-import org.graphstream.graph.Node
 import org.graphstream.graph.implementations.MultiGraph
 
-import java.io.IOException
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.util.stream.Collectors
 import scala.io.Source
 import scala.util.Using
-import com.barrybecker4.discreteoptimization.traffic.viewer.TrafficGraphUtil.{addEdgeLengths, showNodeLabels}
+import com.barrybecker4.discreteoptimization.traffic.viewer.TrafficGraphUtil.addEdgeLengths
 
 
 object TrafficGraphGenerator {
@@ -37,7 +31,6 @@ class TrafficGraphGenerator {
   }
 
   private def populateGraph(graph: MultiGraph): Unit = {
-    var edge: Edge = null
     graph.addNode("A")
     graph.addNode("B")
     graph.addNode("C")
@@ -63,29 +56,18 @@ class TrafficGraphGenerator {
     graph.getNode("D4").setAttribute("xyz", 200d, -300d, 0.0)
     graph.getNode("D5").setAttribute("xyz", -200d, -300d, 0.0)
     graph.getNode("D6").setAttribute("xyz", -250d, -100d, 0.0)
-    edge = graph.addEdge("CD1", "C", "D1", true)
-    setEdgePoint(edge, -100.0, 800.0)
+    setEdgePoint(graph.addEdge("CD1", "C", "D1", true), -100.0, 800.0)
     graph.addEdge("D2C", "D2", "C", true)
-    edge = graph.addEdge("BD3", "B", "D3", true)
-    setEdgePoint(edge, 1000.0d, -600.0d)
-    edge = graph.addEdge("D4B", "D4", "B", true)
-    setEdgePoint(edge, 800.0d, -700.0d)
-    edge = graph.addEdge("AD5", "A", "D5", true)
-    setEdgePoint(edge, -800.0d, -600.0d)
-    edge = graph.addEdge("D6A", "D6", "A", true)
-    setEdgePoint(edge, -800.0d, -300.0d)
-    edge = graph.addEdge("D1D6", "D1", "D6", true)
-    setEdgePoint(edge, -100.0d, 100.0d)
-    edge = graph.addEdge("D1D4", "D1", "D4", true)
-    setEdgePoint(edge, 0.0d, -0.0d)
-    edge = graph.addEdge("D5D2", "D5", "D2", true)
-    setEdgePoint(edge, 0.0d, 0.0d)
-    edge = graph.addEdge("D3D2", "D3", "D2", true)
-    setEdgePoint(edge, 100.0d, 100.0d)
-    edge = graph.addEdge("D3D6", "D3", "D6", true)
-    setEdgePoint(edge, 0.0d, -0.0d)
-    edge = graph.addEdge("D5D4", "D5", "D4", true)
-    setEdgePoint(edge, 0.0d, -240.0d)
+    setEdgePoint(graph.addEdge("BD3", "B", "D3", true), 1000.0d, -600.0d)
+    setEdgePoint(graph.addEdge("D4B", "D4", "B", true), 800.0d, -700.0d)
+    setEdgePoint(graph.addEdge("AD5", "A", "D5", true), -800.0d, -600.0d)
+    setEdgePoint(graph.addEdge("D6A", "D6", "A", true), -800.0d, -300.0d)
+    setEdgePoint(graph.addEdge("D1D6", "D1", "D6", true), -100.0d, 100.0d)
+    setEdgePoint(graph.addEdge("D1D4", "D1", "D4", true), 0.0d, -0.0d)
+    setEdgePoint(graph.addEdge("D5D2", "D5", "D2", true), 0.0d, 0.0d)
+    setEdgePoint(graph.addEdge("D3D2", "D3", "D2", true), 100.0d, 100.0d)
+    setEdgePoint(graph.addEdge("D3D6", "D3", "D6", true), 0.0d, -0.0d)
+    setEdgePoint(graph.addEdge("D5D4", "D5", "D4", true), 0.0d, -240.0d)
     addEdgeLengths(graph)
     // showNodeLabels(graph)
   }
