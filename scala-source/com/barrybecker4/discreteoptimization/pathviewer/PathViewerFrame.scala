@@ -1,8 +1,7 @@
 package com.barrybecker4.discreteoptimization.pathviewer
 
-import com.barrybecker4.graph.Path
-import com.barrybecker4.graph.directed.{DirectedEdge, DirectedGraphParser}
-import com.barrybecker4.graph.visualization.{GraphStreamAdapter, GraphViewer, GraphViewerFrame}
+import com.barrybecker4.graph.directed.DirectedGraphParser
+import com.barrybecker4.graph.visualization.{GraphStreamAdapter, GraphViewerFrame}
 import com.barrybecker4.discreteoptimization.kshortestpaths.KShortestPathsTstUtil
 import com.barrybecker4.discreteoptimization.kshortestpaths.model.KShortestPathsSolution
 import com.barrybecker4.discreteoptimization.kshortestpaths.solver.YensKPathsSolver
@@ -11,20 +10,11 @@ import com.barrybecker4.discreteoptimization.pathviewer.render.ShortestPathRende
 import com.barrybecker4.discreteoptimization.pathviewer.render.KShortestPathRenderer
 import com.barrybecker4.discreteoptimization.shortestpaths.ShortestPathsTstUtil
 import com.barrybecker4.discreteoptimization.shortestpaths.model.ShortestPathsSolution
-import com.barrybecker4.discreteoptimization.pathviewer.PathViewerFrame.*
-import com.barrybecker4.discreteoptimization.pathviewer.render.{GraphViewerListener, PathRenderer}
 import com.barrybecker4.discreteoptimization.shortestpaths.solver.{DijkstrasPathSolver, ModifiedDijkstrasPathSolver}
 import org.graphstream.graph.implementations.MultiGraph
-import org.graphstream.graph.{Edge, Graph, Node}
-import org.graphstream.ui.layout.springbox.implementations.{LinLog, SpringBox}
-import org.graphstream.ui.swing_viewer.{SwingViewer, ViewPanel}
-import org.graphstream.ui.view.{View, Viewer, ViewerListener, ViewerPipe}
 
-import java.awt.Color
 import java.io.File
 import javax.swing.*
-import scala.annotation.Annotation
-import scala.io.Source
 
 
 /** Draws the shortest paths and allows interacting with them.
@@ -117,13 +107,12 @@ class PathViewerFrame extends GraphViewerFrame() {
   }
 
   private def getStartIndex(fileName: String): Int = {
-    var idx =  fileName.indexOf(s"_${ModifiedDijkstrasPathSolver.BASE_NAME}_solution")
-    if (idx == -1)
-      idx = fileName.indexOf(s"_${DijkstrasPathSolver.BASE_NAME}_solution")
-    if (idx == -1)
-      idx = fileName.indexOf(s"_${YensKPathsSolver.BASE_NAME}_solution")
-    if (idx == -1)
-      throw new IllegalArgumentException("Invalid fileName: " + fileName)
-    idx
+    val suffixes = Seq(
+      s"_${ModifiedDijkstrasPathSolver.BASE_NAME}_solution",
+      s"_${DijkstrasPathSolver.BASE_NAME}_solution",
+      s"_${YensKPathsSolver.BASE_NAME}_solution"
+    )
+    suffixes.map(fileName.indexOf).find(_ >= 0)
+      .getOrElse(throw new IllegalArgumentException("Invalid fileName: " + fileName))
   }
 }

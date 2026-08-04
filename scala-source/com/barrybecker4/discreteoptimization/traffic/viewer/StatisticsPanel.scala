@@ -74,14 +74,8 @@ class StatisticsPanel(graph: Graph) extends JPanel {
     this.repaint()
   }
 
-  private def getAllVehicles: Set[VehicleSprite] = {
-    var allVehicles = Set[VehicleSprite]()
-    val edges = graph.edges.iterator().asScala
-    for (edge <- edges) {
-      allVehicles ++= getVehiclesOnEdge(edge.getId)
-    }
-    allVehicles
-  }
+  private def getAllVehicles: Set[VehicleSprite] =
+    graph.edges.iterator().asScala.flatMap(e => getVehiclesOnEdge(e.getId)).toSet
 
   private def getVehiclesOnEdge(edgeId: String): mutable.Set[VehicleSprite] = {
     val edge: Edge = graph.getEdge(edgeId)

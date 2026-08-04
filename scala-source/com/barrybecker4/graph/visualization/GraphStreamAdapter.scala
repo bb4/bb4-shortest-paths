@@ -49,7 +49,7 @@ case class GraphStreamAdapter(digraph: DirectedGraph) {
   }
 
   private def addEdgesToGraph(graph: MultiGraph): Unit = {
-    var edgeCount: Map[(Int, Int), Int] = Map()
+    val edgeCount = scala.collection.mutable.Map.empty[(Int, Int), Int]
     val uiClass = if (isLarge) LARGE.name else PLAIN.name
     for (edge <- digraph.edges) {
       val edgeTuple = (edge.source, edge.destination)
@@ -59,7 +59,7 @@ case class GraphStreamAdapter(digraph: DirectedGraph) {
         if (edgeCount.contains(edgeTuple)) baseId + "_" + edgeCount(edgeTuple)
         else baseId
       val graphEdge = graph.addEdge(edgeId, edge.source.toString, edge.destination.toString, true)
-      edgeCount += edgeTuple -> (edgeCount.getOrElse(edgeTuple, 0) + 1)
+      edgeCount(edgeTuple) = edgeCount.getOrElse(edgeTuple, 0) + 1
       val weightText =
         if (edgeCount.contains(reverseTuple)) s"          ${edge.weight}"
         else s"${edge.weight}           "
