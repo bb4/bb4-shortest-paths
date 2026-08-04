@@ -1,18 +1,10 @@
 package com.barrybecker4.discreteoptimization.traffic.viewer.adapter
 
-import com.barrybecker4.common.geometry.FloatLocation
-import com.barrybecker4.graph.directed.DirectedGraph
-import com.barrybecker4.graph.visualization.GraphStreamAdapter.LARGE_GRAPH_THRESH
 import com.barrybecker4.discreteoptimization.traffic.graph.TrafficGraph
-import com.barrybecker4.discreteoptimization.traffic.graph.model.{Intersection, Street}
-import com.barrybecker4.discreteoptimization.traffic.signals.{DumbTrafficSignal, SemaphoreTrafficSignal}
-import org.graphstream.graph.{Edge, Graph}
 import org.graphstream.graph.implementations.MultiGraph
-import org.graphstream.ui.geom.Point3
 import com.barrybecker4.discreteoptimization.traffic.viewer.TrafficGraphUtil.{addEdgeLengths, showNodeLabels}
 import com.barrybecker4.discreteoptimization.traffic.viewer.adapter.TrafficStreamAdapter.SHOW_LABELS
 
-import scala.compiletime.uninitialized
 import scala.io.Source
 import scala.util.Using
 
@@ -34,8 +26,7 @@ object TrafficStreamAdapter {
  */
 case class TrafficStreamAdapter(trafficGraph: TrafficGraph) {
 
-  var intersectionSubGraphs: IndexedSeq[IntersectionSubGraph] = uninitialized
-  private val isLarge = trafficGraph.intersections.size > LARGE_GRAPH_THRESH
+  var intersectionSubGraphs: IndexedSeq[IntersectionSubGraph] = IndexedSeq.empty
 
   def createGraph(): MultiGraph = {
     val graph = new MultiGraph("Some traffic graph")
@@ -59,10 +50,13 @@ case class TrafficStreamAdapter(trafficGraph: TrafficGraph) {
   }
 
   private def addStreetsToGraph(graph: MultiGraph): Unit = {
-    var streetCount: Map[(Int, Int), Int] = Map()
-    // val uiClass = if (isLarge) LARGE.name else PLAIN.name
-    val streetSubGraphs: IndexedSeq[StreetSubGraph] =
-      for (street <- trafficGraph.streets)
-        yield StreetSubGraph(street, intersectionSubGraphs(street.intersectionIdx1), intersectionSubGraphs(street.intersectionIdx2), graph)
+    for (street <- trafficGraph.streets) {
+      StreetSubGraph(
+        street,
+        intersectionSubGraphs(street.intersectionIdx1),
+        intersectionSubGraphs(street.intersectionIdx2),
+        graph
+      )
+    }
   }
 }
