@@ -1,17 +1,14 @@
 package com.barrybecker4.graph
 
-import scala.collection.immutable.Map
+import scala.collection.mutable
 
 class NeighborMap {
 
-  private var map: Map[Int, Set[Int]] = Map()
+  private val map = mutable.Map.empty[Int, Set[Int]]
 
-  def apply(v: Int): Set[Int] = map(v) 
+  def apply(v: Int): Set[Int] = map(v)
 
   def addNeighbor(v1: Int, v2: Int): Unit = {
-    if (map.contains(v1))
-      map += v1 -> (map(v1) + v2)
-    else
-      map += v1 -> Set(v2)
+    map(v1) = map.getOrElse(v1, Set.empty) + v2
   }
 }
