@@ -154,20 +154,18 @@ class ModifiedDijkstrasAlgorithm(graph: DirectedGraph) {
   }
 
   private def correctCostForward(node: Int): Double = {
-    var cost = Double.MaxValue
     val outgoingEdges = graph.outgoingNeighborsOf(node)
     outgoingEdges
       .filter(e => distanceTo.contains(e.destination))
-      .foreach(nextEdge => {
+      .foldLeft(Double.MaxValue) { (cost, nextEdge) =>
         val next = nextEdge.destination
         val newWeight = nextEdge.weight + distanceTo(next)
         if (newWeight < distanceTo.getOrElse(node, Double.MaxValue)) {
           distanceTo.put(node, newWeight)
           predecessorMap += node -> next
-          cost = newWeight
-        }
-      })
-    cost
+          newWeight
+        } else cost
+      }
   }
 
   def getSubShortestPath(source: Int): Option[Path] = {
