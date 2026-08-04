@@ -1,9 +1,5 @@
 package com.barrybecker4.graph.algorithms.shortestpaths
 
-import com.barrybecker4.graph.directed.{DirectedEdge, DirectedGraph}
-
-import scala.collection.mutable.{ArrayBuffer, PriorityQueue}
-
 
 /**
  * find the shortest path in a weighted directed graph using Dijkstra's algorithm

@@ -5,7 +5,6 @@ import com.barrybecker4.graph.directed.{DirectedEdge, DirectedGraph}
 
 import scala.annotation.tailrec
 import scala.collection.mutable
-import scala.collection.mutable.PriorityQueue
 
 
 /**
@@ -38,14 +37,14 @@ import scala.collection.mutable.PriorityQueue
  */
 class ModifiedDijkstrasAlgorithm(graph: DirectedGraph) {
 
-  private var determinedVertexSet: Set[Int] = Set()
+  private val determinedVertexSet: mutable.Set[Int] = mutable.Set.empty
   private val distanceTo: mutable.Map[Int, Double] = mutable.Map()
   private val vertexCandidateQueue: mutable.PriorityQueue[Int] =
     mutable.PriorityQueue.empty(using Ordering.by(distanceTo).reverse)
   private var predecessorMap: Map[Int, Int] = Map()
 
   def clear(): Unit = {
-    determinedVertexSet = Set()
+    determinedVertexSet.clear()
     vertexCandidateQueue.clear()
     distanceTo.clear()
     predecessorMap = Map()

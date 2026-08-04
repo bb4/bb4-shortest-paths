@@ -3,7 +3,6 @@ package com.barrybecker4.graph.algorithms.shortestpaths
 import com.barrybecker4.graph.directed.DirectedGraph
 
 import scala.collection.mutable
-import scala.collection.mutable.PriorityQueue
 
 
 /**
