@@ -1,6 +1,5 @@
 package com.barrybecker4.discreteoptimization.traffic.signals
 
-import com.barrybecker4.discreteoptimization.traffic.signals.SignalState
 import com.barrybecker4.discreteoptimization.traffic.signals.SignalState.{GREEN, RED, YELLOW}
 import com.barrybecker4.discreteoptimization.traffic.vehicles.VehicleSprite
 import org.graphstream.graph.Node
@@ -50,22 +49,13 @@ trait TrafficSignal(numStreets: Int) {
       case YELLOW =>
         val yellowElapsedTime = (System.currentTimeMillis() - yellowStartTime) / 1000.0
         val yellowRemainingTime = getYellowDurationSecs.toDouble - yellowElapsedTime
-        var vehicleIdx = sortedVehicles.size
-        var found = false
-        var vehicle: VehicleSprite = null
-        while (!found && vehicleIdx > 0) {
-          vehicleIdx -= 1
-          vehicle = sortedVehicles(vehicleIdx)
+        val vehicleToBrake = sortedVehicles.reverseIterator.find { vehicle =>
           val distanceToLight = (1.0 - vehicle.getPosition) * edgeLen
           val distAtCurrentSpeed = yellowRemainingTime * vehicle.getSpeed
           val farDist = (yellowRemainingTime + getYellowDurationSecs) * vehicle.getSpeed
-          if (distAtCurrentSpeed > distanceToLight && distAtCurrentSpeed < farDist) {
-            found = true
-          }
+          distAtCurrentSpeed > distanceToLight && distAtCurrentSpeed < farDist
         }
-        if (found) {
-          vehicle.brake(yellowRemainingTime * vehicle.getSpeed, deltaTime)
-        }
+        vehicleToBrake.foreach(v => v.brake(yellowRemainingTime * v.getSpeed, deltaTime))
       case GREEN =>
         vehicleClosestToLight.accelerate(0.1)
     }

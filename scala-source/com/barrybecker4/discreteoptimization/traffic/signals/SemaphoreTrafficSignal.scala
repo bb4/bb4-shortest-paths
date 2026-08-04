@@ -3,15 +3,10 @@ package com.barrybecker4.discreteoptimization.traffic.signals
 import com.barrybecker4.discreteoptimization.traffic.signals.{SignalState, TrafficSignal}
 import com.barrybecker4.discreteoptimization.traffic.signals.SignalState.*
 
-import java.util.concurrent.{Executors, ScheduledFuture, Semaphore, TimeUnit}
+import java.util.concurrent.{Executors, ScheduledFuture, TimeUnit}
 import concurrent.duration.DurationInt
 import com.barrybecker4.discreteoptimization.traffic.signals.SemaphoreTrafficSignal.*
 import com.barrybecker4.discreteoptimization.traffic.vehicles.VehicleSprite
-import com.barrybecker4.discreteoptimization.traffic.viewer.TrafficGraphUtil.sleep
-import org.graphstream.graph.Node
-
-import scala.annotation.tailrec
-import scala.compiletime.uninitialized
 
 /**
  * A more intelligent traffic light system that uses a semaphore to control the traffic lights.
@@ -26,7 +21,7 @@ import scala.compiletime.uninitialized
  */
 class SemaphoreTrafficSignal(numStreets: Int) extends TrafficSignal(numStreets) {
   private val lightStates: Array[SignalState] = Array.fill(numStreets)(RED)
-  private var currentSchedule: ScheduledFuture[?] = uninitialized
+  private var currentSchedule: Option[ScheduledFuture[?]] = None
   private var streetWithSemaphore: Int = AVAILABLE
   private var lastToBecomeRed: Int = -1
 
@@ -67,10 +62,10 @@ class SemaphoreTrafficSignal(numStreets: Int) extends TrafficSignal(numStreets) 
         println("Next street is jammed, so switching to yellow")
         switchToYellow(portId, sortedVehicles, edgeLen)
       }
-    } else if (currentSchedule != null && lightState == GREEN) {
+    } else if (currentSchedule.isDefined && lightState == GREEN) {
       println("No cars coming on street " + portId + " so canceling schedule and switching to red")
-      currentSchedule.cancel(true)
-      currentSchedule = null
+      currentSchedule.foreach(_.cancel(true))
+      currentSchedule = None
       switchToRed(portId)
     }
   }
@@ -101,9 +96,9 @@ class SemaphoreTrafficSignal(numStreets: Int) extends TrafficSignal(numStreets) 
         lightStates(street) = GREEN
         streetWithSemaphore = street
         sortedVehicles.last.accelerate(0.1)
-        currentSchedule = scheduler.schedule(new Runnable {
+        currentSchedule = Some(scheduler.schedule(new Runnable {
           def run(): Unit = switchToYellow(street, sortedVehicles, edgeLen)
-        }, getGreenDurationSecs, TimeUnit.SECONDS)
+        }, getGreenDurationSecs, TimeUnit.SECONDS))
       } else {
         lastToBecomeRed = -1
       }
@@ -117,10 +112,10 @@ class SemaphoreTrafficSignal(numStreets: Int) extends TrafficSignal(numStreets) 
     yellowStartTime = System.currentTimeMillis()
     assert(streetWithSemaphore == street)
     println("switched to yellow and scheduling switch to red for street " + street + " schedule=" + currentSchedule)
-    currentSchedule.cancel(true)
-    currentSchedule = scheduler.schedule(new Runnable {
+    currentSchedule.foreach(_.cancel(true))
+    currentSchedule = Some(scheduler.schedule(new Runnable {
       def run(): Unit = switchToRed(street)
-    }, getYellowDurationSecs, TimeUnit.SECONDS)
+    }, getYellowDurationSecs, TimeUnit.SECONDS))
   }
 
   private def switchToRed(street: Int): Unit = {
@@ -141,7 +136,6 @@ class SemaphoreTrafficSignal(numStreets: Int) extends TrafficSignal(numStreets) 
 object SemaphoreTrafficSignal {
 
   private val AVAILABLE = -1
-  private val JAM_FACTOR = 2.0
 
   def main(args: Array[String]): Unit = {
     val numStreets = 5
