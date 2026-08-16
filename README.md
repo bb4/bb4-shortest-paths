@@ -1,6 +1,6 @@
 # bb4-shortest-paths
 
-📊 [Build status for all bb4 projects](https://github.com/bb4)
+📊 [Build status for all bb4 projects](https://github.com/bb4/.github)
 
 Some shortest path algorithm implementations and visualizations.
  - Dijkstra's algorithm - single-source shortest paths 
