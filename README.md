@@ -1,5 +1,7 @@
 # bb4-shortest-paths
 
+📊 [Build status for all bb4 projects](https://github.com/bb4)
+
 Some shortest path algorithm implementations and visualizations.
  - Dijkstra's algorithm - single-source shortest paths 
  - ModifiedDijkstra's - shortest path between two nodes
