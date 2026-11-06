@@ -38,9 +38,10 @@ case class GraphStreamAdapter(digraph: DirectedGraph) {
     graph
   }
 
-  private def markSource(graph: MultiGraph, sourceVertex: Int): Unit =
-    if (sourceVertex >= 0 && sourceVertex < digraph.numVertices)
-      graph.getNode(sourceVertex.toString).setAttribute("ui.class", "source")
+  private def markSource(graph: MultiGraph, sourceVertex: Int): Unit = {
+    val node = graph.getNode(sourceVertex.toString)
+    if (node != null) node.setAttribute("ui.class", "source")
+  }
 
   private def addNodesToGraph(graph: MultiGraph): Unit = {
     val vertexIds = digraph.edges.flatMap(e => Seq(e.source, e.destination)).distinct.sorted
