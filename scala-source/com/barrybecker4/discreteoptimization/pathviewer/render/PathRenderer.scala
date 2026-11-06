@@ -57,7 +57,7 @@ trait PathRenderer(graph: MultiGraph, viewer: Viewer) {
     var prevNode: Option[Node] = None
 
     for (nodeIdx <- path.nodes) {
-      val nextNode = graph.getNode(nodeIdx)
+      val nextNode = graph.getNode(nodeIdx.toString)
       prevNode.foreach { prev =>
         val leavingEdge = prev.leavingEdges().filter(e => e.getNode1 == nextNode).findFirst()
         if (leavingEdge.isPresent) onEdge(leavingEdge.get)
