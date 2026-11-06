@@ -34,6 +34,7 @@ class PathViewerFrame extends GraphViewerFrame() {
   private var activeRenderer: Option[PathRenderer] = None
   private var loaded: Option[DirectedGraph] = None
   private val solveBar = new SolveBar(solve, _ => ())
+  @volatile private var lastSummary = "Open a graph, then Solve"
   getContentPane.add(solveBar, BorderLayout.NORTH)
 
   private[pathviewer] def loadedGraph: Option[DirectedGraph] = loaded
@@ -42,6 +43,7 @@ class PathViewerFrame extends GraphViewerFrame() {
 
   override protected def setGraph(graph: Graph, title: String): Unit = {
     stopActiveRenderer()
+    solveBar.setLegend(Seq.empty)
     super.setGraph(graph, title)
   }
 
@@ -140,13 +142,13 @@ class PathViewerFrame extends GraphViewerFrame() {
   private[pathviewer] def solve(request: SolveRequest): Unit = {
     val digraph = loaded match {
       case None =>
-        solveBar.setStatus("Open a graph first")
+        setSummary("Open a graph first")
         return
       case Some(graph) => graph
     }
     LiveSolver.validate(digraph, request) match {
       case Left(message) =>
-        solveBar.setStatus(message)
+        setSummary(message)
       case Right(valid) =>
         solveBar.setBusy(true)
         val worker = new SwingWorker[SolveResult, java.lang.Void] {
@@ -155,16 +157,16 @@ class PathViewerFrame extends GraphViewerFrame() {
             val discardMsg = "Solve discarded because the graph changed"
             try {
               val result = get()
-              if (!currentGraphIs(digraph)) solveBar.setStatus(discardMsg)
+              if (!currentGraphIs(digraph)) setSummary(discardMsg)
               else showSolved(digraph, valid, result)
             } catch {
               case _: CancellationException => ()
               case _: InterruptedException =>
                 Thread.currentThread().interrupt()
               case ex: ExecutionException =>
-                solveBar.setStatus(ex.getCause.toString)
+                setSummary(ex.getCause.toString)
               case ex: Exception =>
-                solveBar.setStatus(ex.toString)
+                setSummary(ex.toString)
             } finally {
               solveBar.setBusy(false)
             }
@@ -197,18 +199,15 @@ class PathViewerFrame extends GraphViewerFrame() {
     setGraph(stream, titleFor(request))
     result match {
       case SolveResult.ToAll(solution, trace) =>
-        solveBar.setLegend(Seq.empty)
         showShortestPaths(solution, stream, trace)
-        solveBar.setStatus(dijkstraStatus(request, solution))
+        setSummary(dijkstraStatus(request, solution))
       case SolveResult.OnePath(path, trace) =>
-        solveBar.setLegend(Seq.empty)
         val solution = ShortestPathsSolution(path.weight, List(path))
         showShortestPaths(solution, stream, trace)
-        solveBar.setStatus(onePathStatus(request, path))
+        setSummary(onePathStatus(request, path))
       case SolveResult.KPaths(solution) =>
-        solveBar.setLegend(solution.shortestPaths.indices.map(index => (index + 1, PathColors.getColor(index))))
         showKShortestPaths(solution, stream)
-        solveBar.setStatus(f"Yen k=${solution.k} total ${solution.totalCost}%.4g")
+        setSummary(f"Yen k=${solution.k} total ${solution.totalCost}%.4g")
     }
   }
 
@@ -218,6 +217,7 @@ class PathViewerFrame extends GraphViewerFrame() {
       trace: com.barrybecker4.graph.algorithms.shortestpaths.SearchTrace
   ): Unit = {
     if (solveBar.animateSelected && trace.events.nonEmpty) {
+      solveBar.setLegend(Seq.empty)
       val control = new PlaybackControl
       solveBar.bindPlayback(control)
       activate(new AnimatedShortestPathRenderer(graph, solution, viewer, trace, control))
@@ -250,18 +250,28 @@ class PathViewerFrame extends GraphViewerFrame() {
   private def sourceVertex(solution: KShortestPathsSolution): Int =
     solution.shortestPaths.view.flatMap(_.nodes.headOption).headOption.getOrElse(0)
 
-  protected def showShortestPaths(solution: ShortestPathsSolution, graph: MultiGraph): Unit =
+  protected def showShortestPaths(solution: ShortestPathsSolution, graph: MultiGraph): Unit = {
+    solveBar.setLegend(Seq.empty)
     activate(ShortestPathRenderer(graph, solution, viewer))
+  }
 
-  protected def showKShortestPaths(solution: KShortestPathsSolution, graph: MultiGraph): Unit =
+  protected def showKShortestPaths(solution: KShortestPathsSolution, graph: MultiGraph): Unit = {
+    solveBar.setLegend(solution.shortestPaths.indices.map(index => (index + 1, PathColors.getColor(index))))
     activate(KShortestPathRenderer(graph, solution, viewer))
+  }
 
   private[pathviewer] def setAnimate(on: Boolean): Unit = solveBar.setAnimateDefault(on)
 
   private def activate(renderer: PathRenderer): Unit = {
-    renderer.statusListener = text => solveBar.setStatus(text)
+    renderer.statusListener = text =>
+      SwingUtilities.invokeLater(() => solveBar.setStatus(if (text.isEmpty) lastSummary else text))
     activeRenderer = Some(renderer)
     renderer.render()
+  }
+
+  private def setSummary(text: String): Unit = {
+    lastSummary = text
+    solveBar.setStatus(text)
   }
 
   private def getGraphName(fileName: String): String = {

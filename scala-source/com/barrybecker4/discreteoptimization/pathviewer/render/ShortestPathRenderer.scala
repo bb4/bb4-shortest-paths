@@ -21,7 +21,8 @@ object ShortestPathRenderer {
       }
     } else {
       solution.paths.lift(nodeIdx)
-        .filter(path => path.nodes.isEmpty || path.weight.isPosInfinity)
+        .filter(_ => solution.paths.size > 1)
+        .filter(path => path.nodes.isEmpty && path.weight.isPosInfinity)
         .map(_ => "unreachable")
     }
   }

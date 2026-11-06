@@ -18,6 +18,14 @@ class HoverTextSuite extends AnyFunSuite {
     assert(ShortestPathRenderer.distanceText(solution, 9).isEmpty)
   }
 
+  test("one-path solution does not use its path as a vertex-indexed fallback") {
+    val solution = ShortestPathsSolution(
+      Double.PositiveInfinity,
+      List(Path(Double.PositiveInfinity, List()))
+    )
+    assert(ShortestPathRenderer.distanceText(solution, 0).isEmpty)
+  }
+
   test("rank text is 1-based and lists every path through the node") {
     val solution = KShortestPathsSolution(7.0, 2, 2, Seq(
       Path(3.0, List(0, 1, 2)),
