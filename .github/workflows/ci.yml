@@ -21,9 +21,9 @@ jobs:
       - name: Build and test
         run: |
           if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
-            ./gradlew clean build --refresh-dependencies --info
+            ./gradlew clean build --refresh-dependencies --info -Djava.awt.headless=true
           else
-            ./gradlew build --info
+            ./gradlew build --info -Djava.awt.headless=true
           fi
 
       - name: Publish SNAPSHOT
