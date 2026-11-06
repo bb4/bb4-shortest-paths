@@ -53,7 +53,7 @@ class PathViewerFrame extends GraphViewerFrame() {
 
   private def altFor(graph: DirectedGraph): AltAlgorithm =
     cachedAlt match {
-      case Some((g, alg)) if (g eq graph) => alg
+      case Some((g, alg)) if g eq graph => alg
       case _ =>
         val alg = new AltAlgorithm(graph)
         cachedAlt = Some((graph, alg))

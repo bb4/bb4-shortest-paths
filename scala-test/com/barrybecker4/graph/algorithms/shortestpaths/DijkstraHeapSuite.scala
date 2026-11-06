@@ -14,8 +14,8 @@ class DijkstraHeapSuite extends AnyFunSuite {
     heap.enqueue(1, 3.0)
 
     val best = Map(1 -> 3.0, 2 -> 1.0)
-    assert(heap.extractMin(stillBest(best)) == Some(2))
-    assert(heap.extractMin(stillBest(best)) == Some(1))
+    assert(heap.extractMin(stillBest(best)).contains(2))
+    assert(heap.extractMin(stillBest(best)).contains(1))
     assert(heap.extractMin(stillBest(best)).isEmpty)
   }
 
@@ -31,7 +31,7 @@ class DijkstraHeapSuite extends AnyFunSuite {
     heap.enqueue(0, 5.0)
     heap.enqueue(0, 1.0)
     val stillBest = (vertex: Int, queued: Double) => vertex == 0 && DijkstraHeap.sameDistance(queued, 1.0)
-    assert(heap.minKey(stillBest) == Some(1.0))
-    assert(heap.extractMin(stillBest) == Some(0))
+    assert(heap.minKey(stillBest).contains(1.0))
+    assert(heap.extractMin(stillBest).contains(0))
   }
 }

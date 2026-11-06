@@ -22,7 +22,7 @@ class BellmanFordPathSolverSuite extends BaseSolverSuite {
   test("findPaths throws on negative_cycle_01") {
     val graph = GraphTstUtil.getGraph("negative_cycle_01")
     intercept[IllegalStateException] {
-      new BellmanFordPathSolver().findPaths(graph, 0)
+      new BellmanFordPathSolver().findPaths(graph)
     }
   }
 

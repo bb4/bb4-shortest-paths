@@ -73,7 +73,7 @@ class BidirectionalDijkstrasAlgorithmSuite extends AnyFunSuite {
     val deadEnds = (0 until 10).map(i => DirectedEdge(0, 2 + i, 0.1))
     val graph = DirectedGraph(
       12,
-      (DirectedEdge(0, 1, 1.0) +: deadEnds).toIndexedSeq
+      (DirectedEdge(0, 1, 1.0) +: deadEnds)
     )
     val observer = SearchObserver.recording()
     val path = new BidirectionalDijkstrasAlgorithm(graph).getShortestPath(0, 1, observer)
