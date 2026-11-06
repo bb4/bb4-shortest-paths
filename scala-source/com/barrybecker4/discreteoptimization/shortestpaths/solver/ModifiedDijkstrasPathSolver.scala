@@ -17,10 +17,7 @@ class ModifiedDijkstrasPathSolver extends ShortestPathsSolver {
 
   var graph: DirectedGraph = uninitialized
 
-  /**
-   * Find k shortest paths from source
-   * For now, just print the shortest path k times
-   */
+  /** Single-source shortest paths from `sourceVertex` to every vertex. */
   def findPaths(graph: DirectedGraph, sourceVertex: Int): ShortestPathsSolution = {
 
     val alg = new ModifiedDijkstrasAlgorithm(graph)

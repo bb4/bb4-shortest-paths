@@ -4,7 +4,6 @@ import com.barrybecker4.graph.Path
 import com.barrybecker4.graph.directed.DirectedEdge
 
 import scala.annotation.tailrec
-import scala.collection.mutable.ArrayBuffer
 
 
 /**
@@ -13,8 +12,8 @@ import scala.collection.mutable.ArrayBuffer
  */
 case class ShortestPaths(numNodes: Int, source: Int) {
 
-  private val edgeTo = ArrayBuffer.fill[Option[DirectedEdge]](numNodes)(None)
-  private val distTo = ArrayBuffer.fill(numNodes)(Double.PositiveInfinity)
+  private val edgeTo = Array.fill[Option[DirectedEdge]](numNodes)(None)
+  private val distTo = Array.fill(numNodes)(Double.PositiveInfinity)
   distTo(source) = 0.0
   
   def pathNodesToVertex(vertex: Int): List[Int] = {

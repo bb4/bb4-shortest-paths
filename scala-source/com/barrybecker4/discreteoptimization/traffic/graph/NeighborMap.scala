@@ -1,7 +1,8 @@
-package com.barrybecker4.graph
+package com.barrybecker4.discreteoptimization.traffic.graph
 
 import scala.collection.mutable
 
+/** Undirected vertex adjacency used by the traffic graph. */
 class NeighborMap {
 
   private val map = mutable.Map.empty[Int, Set[Int]]

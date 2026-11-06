@@ -41,4 +41,39 @@ class ChangeableDirectedGraphSuite extends AnyFunSuite {
       g.findOrigEdge(2, 0)
     }
   }
+
+  test("remove drops only the lighter parallel edge") {
+    val g = ChangeableDirectedGraph(
+      DirectedGraph(
+        2,
+        IndexedSeq(DirectedEdge(0, 1, 5.0), DirectedEdge(0, 1, 1.0))
+      )
+    )
+    g.remove(0, 1)
+    assert(g.outgoingNeighborsOf(0) == IndexedSeq(DirectedEdge(0, 1, 5.0)))
+  }
+
+  test("one remove hides every equal parallel edge and recover restores them") {
+    val edges = IndexedSeq(DirectedEdge(0, 1, 1.0), DirectedEdge(0, 1, 1.0))
+    val g = ChangeableDirectedGraph(DirectedGraph(2, edges))
+    g.remove(0, 1)
+    assert(g.outgoingNeighborsOf(0).isEmpty)
+    g.recover(0, 1)
+    assert(g.outgoingNeighborsOf(0) == edges)
+  }
+
+  test("findOrigEdge returns the lighter parallel edge") {
+    val g = ChangeableDirectedGraph(
+      DirectedGraph(
+        2,
+        IndexedSeq(
+          DirectedEdge(0, 1, 9.0),
+          DirectedEdge(0, 1, 2.0),
+          DirectedEdge(0, 1, 4.0)
+        )
+      )
+    )
+
+    assert(g.findOrigEdge(0, 1) == DirectedEdge(0, 1, 2.0))
+  }
 }

@@ -29,8 +29,8 @@ case class DirectedGraphParser() extends Parser[DirectedGraph] {
     }
 
   /**
-   * Warn if there are any duplicate edges. Normally, there should not be.
-   * Just warn the first time to avoid too many warnings.
+   * Parallel edges, including equal weights, are kept.
+   * Warn on each repeated (source, dest) pair so the input is visible.
    */
   private def parseEdges(start: Int, numEdges: Int, lines: IndexedSeq[String]): IndexedSeq[DirectedEdge] = {
     val edges = ArrayBuffer[DirectedEdge]()

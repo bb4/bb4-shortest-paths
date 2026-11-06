@@ -13,9 +13,7 @@ object YensKPathsSolver {
  */
 class YensKPathsSolver(k: Int = 3) extends KShortestPathsSolver {
 
-  /**
-   * Find k shortest paths from source
-   */
+  /** The k shortest loopless paths from `source` to `destination`. */
   def findPaths(graph: DirectedGraph, source: Int, destination: Int, k: Int): KShortestPathsSolution = {
 
     val paths: Seq[Path] = YensAlgorithm(graph).findKShortestPaths(source, destination, k)

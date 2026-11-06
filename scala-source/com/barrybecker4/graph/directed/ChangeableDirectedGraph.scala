@@ -29,11 +29,14 @@ class ChangeableDirectedGraph(numVertices: Int, edges: IndexedSeq[DirectedEdge],
   def recover(source: Int, dest: Int): Unit = 
     removedEdgeSet -= findOrigEdge(source, dest)
   
+  /**
+   * Lightest original edge from `source` to `dest`.
+   * Parallel edges are distinguished by weight; equal weights are interchangeable.
+   */
   def findOrigEdge(source: Int, dest: Int): DirectedEdge = {
-    val edges = super.outgoingNeighborsOf(source)
-    val optEdge = edges.find(edge => edge.destination == dest)
-    if (optEdge.isEmpty) throw new IllegalStateException("No edge found from " + source + " to " + dest) 
-    else optEdge.get
+    val matches = super.outgoingNeighborsOf(source).filter(_.destination == dest)
+    if (matches.isEmpty) throw new IllegalStateException("No edge found from " + source + " to " + dest)
+    else matches.minBy(_.weight)
   }
  
   def recover(): Unit = {
@@ -41,13 +44,13 @@ class ChangeableDirectedGraph(numVertices: Int, edges: IndexedSeq[DirectedEdge],
     removedNodeSet = Set()
   }
 
-  override def incomingNeighborsOf(node: Int): Set[DirectedEdge] = {
-    if (removedNodeSet.contains(node)) Set.empty
+  override def incomingNeighborsOf(node: Int): IndexedSeq[DirectedEdge] = {
+    if (removedNodeSet.contains(node)) IndexedSeq.empty
     else super.incomingNeighborsOf(node).filter(edge => !removedNodeSet.contains(edge.source) && !removedEdgeSet.contains(edge))
   }
 
-  override def outgoingNeighborsOf(node: Int): Set[DirectedEdge] = {
-    if (removedNodeSet.contains(node)) Set.empty 
+  override def outgoingNeighborsOf(node: Int): IndexedSeq[DirectedEdge] = {
+    if (removedNodeSet.contains(node)) IndexedSeq.empty
     else super.outgoingNeighborsOf(node).filter(edge => !removedNodeSet.contains(edge.destination) && !removedEdgeSet.contains(edge))
   }
 

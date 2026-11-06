@@ -1,17 +1,22 @@
 package com.barrybecker4.graph.directed
 
-import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
-/** 
- * Keeps track of node neighbors. There can be more than one edge from a to b.
+/**
+ * Edges incident to each vertex, stored in an array indexed by vertex id.
+ * Parallel edges are retained in insertion order, including equal weights.
+ * Call [[freeze]] after the last [[addNeighbor]].
  */
-class DirectedNeighborMap {
+class DirectedNeighborMap(numVertices: Int) {
 
-  private val map = mutable.Map.empty[Int, Set[DirectedEdge]]
+  private val buffers = Array.fill(numVertices)(ArrayBuffer.empty[DirectedEdge])
+  private var neighbors: Array[IndexedSeq[DirectedEdge]] = _
 
-  def apply(v: Int): Set[DirectedEdge] = map.getOrElse(v, Set.empty)
+  def apply(v: Int): IndexedSeq[DirectedEdge] = neighbors(v)
 
-  def addNeighbor(v1: Int, edge: DirectedEdge): Unit = {
-    map(v1) = map.getOrElse(v1, Set.empty) + edge
-  }
+  def addNeighbor(v: Int, edge: DirectedEdge): Unit =
+    buffers(v) += edge
+
+  def freeze(): Unit =
+    neighbors = buffers.map(_.toIndexedSeq)
 }
