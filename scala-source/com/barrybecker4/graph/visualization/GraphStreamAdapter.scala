@@ -38,7 +38,8 @@ case class GraphStreamAdapter(digraph: DirectedGraph) {
   }
 
   private def addNodesToGraph(graph: MultiGraph): Unit = {
-    for (nodeId <- Range(0, digraph.numVertices)) {
+    val vertexIds = digraph.edges.flatMap(e => Seq(e.source, e.destination)).distinct.sorted
+    for (nodeId <- vertexIds) {
       val node = graph.addNode(nodeId.toString)
       node.setAttribute("ui.label", node.getId)
       if (digraph.locations.isDefined) {
