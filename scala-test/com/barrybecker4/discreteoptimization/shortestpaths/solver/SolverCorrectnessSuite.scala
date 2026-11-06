@@ -96,7 +96,7 @@ class SolverCorrectnessSuite extends AnyFunSuite {
   test("single-vertex graph costs 0 at the source") {
     val graph = DirectedGraph(1, IndexedSeq.empty)
     val dijkstra = DijkstrasPathSolver().findPaths(graph)
-    val modified = ModifiedDijkstrasPathSolver().findPaths(graph, 0)
+    val modified = ModifiedDijkstrasPathSolver().findPaths(graph)
     assert(dijkstra.paths == List(Path(0.0, List(0))))
     assert(dijkstra.totalCost == 0.0)
     assert(modified.paths == List(Path(0.0, List(0))))

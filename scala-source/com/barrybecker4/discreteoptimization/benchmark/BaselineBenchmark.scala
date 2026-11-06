@@ -127,7 +127,7 @@ object BaselineBenchmark {
       numPaths.toString
     ).mkString(",")
     rows += line
-    println(f"${bench.graph}%-18s ${bench.role}%-8s ${solver}%-20s ${warmup}%6d ${millis}%8d ${totalCost}%16s ${numPaths}%6d")
+    println(f"${bench.graph}%-18s ${bench.role}%-8s $solver%-20s $warmup%6d $millis%8d $totalCost%16s $numPaths%6d")
   }
 
   private def checkGolden(
