@@ -29,6 +29,21 @@ class DijkstraHeap {
       if (stillBest(vertex, distQueued)) Some(vertex)
       else extractMin(stillBest)
     }
+
+  /**
+   * Drop stale heads permanently, then put the first still-best entry back so a
+   * later [[extractMin]] returns it. Returns that entry's queued distance.
+   */
+  @tailrec
+  final def minKey(stillBest: (Int, Double) => Boolean): Option[Double] =
+    if (queue.isEmpty) None
+    else {
+      val entry @ (vertex, distQueued) = queue.dequeue()
+      if (stillBest(vertex, distQueued)) {
+        queue.enqueue(entry)
+        Some(distQueued)
+      } else minKey(stillBest)
+    }
 }
 
 object DijkstraHeap {

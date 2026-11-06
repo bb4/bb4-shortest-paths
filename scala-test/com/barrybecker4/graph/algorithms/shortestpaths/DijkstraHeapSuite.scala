@@ -25,4 +25,13 @@ class DijkstraHeapSuite extends AnyFunSuite {
     heap.clear()
     assert(heap.extractMin((_, _) => true).isEmpty)
   }
+
+  test("minKey skips a stale longer entry and leaves the live minimum for extractMin") {
+    val heap = DijkstraHeap()
+    heap.enqueue(0, 5.0)
+    heap.enqueue(0, 1.0)
+    val stillBest = (vertex: Int, queued: Double) => vertex == 0 && DijkstraHeap.sameDistance(queued, 1.0)
+    assert(heap.minKey(stillBest) == Some(1.0))
+    assert(heap.extractMin(stillBest) == Some(0))
+  }
 }

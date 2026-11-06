@@ -1,5 +1,6 @@
 package com.barrybecker4.discreteoptimization.pathviewer.render
 
+import com.barrybecker4.graph.algorithms.shortestpaths.SearchDirection
 import com.barrybecker4.graph.algorithms.shortestpaths.SearchEvent.*
 import org.graphstream.graph.implementations.MultiGraph
 import org.scalatest.funsuite.AnyFunSuite
@@ -26,5 +27,18 @@ class FrontierPlayerSuite extends AnyFunSuite {
     player.apply(Extracted(1))
     assert(graph.getNode("1").getAttribute("ui.class", classOf[String]) == "current")
     assert(source.getAttribute("ui.class", classOf[String]) == "visited, source")
+  }
+
+  test("backward settled uses visitedBack while forward settled uses visited") {
+    val graph = new MultiGraph("t")
+    graph.addNode("0")
+    graph.addNode("1")
+    val player = new FrontierPlayer(graph)
+
+    player.apply(Settled(0))
+    assert(graph.getNode("0").getAttribute("ui.class", classOf[String]) == "visited")
+
+    player.apply(Settled(1, SearchDirection.Backward))
+    assert(graph.getNode("1").getAttribute("ui.class", classOf[String]) == "visitedBack")
   }
 }

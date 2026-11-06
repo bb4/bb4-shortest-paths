@@ -1,6 +1,7 @@
 package com.barrybecker4.discreteoptimization.pathviewer
 
 import com.barrybecker4.discreteoptimization.pathviewer.AlgorithmKind.*
+import com.barrybecker4.graph.GraphTstUtil
 import com.barrybecker4.graph.Path
 import com.barrybecker4.graph.directed.{DirectedEdge, DirectedGraph}
 import org.scalatest.funsuite.AnyFunSuite
@@ -38,7 +39,7 @@ class LiveSolverSuite extends AnyFunSuite {
     result match {
       case SolveResult.OnePath(path, trace) =>
         assert(path == Path(3.0, List(0, 1, 2)))
-        assert(trace.events.collect { case com.barrybecker4.graph.algorithms.shortestpaths.SearchEvent.Settled(v) => v } ==
+        assert(trace.events.collect { case com.barrybecker4.graph.algorithms.shortestpaths.SearchEvent.Settled(v, _) => v } ==
           Vector(0, 1, 2))
       case other => fail(s"expected OnePath, got $other")
     }
@@ -48,7 +49,7 @@ class LiveSolverSuite extends AnyFunSuite {
     val result = LiveSolver.solve(triangle, SolveRequest(Dijkstra, 0, 2, 3))
     result match {
       case SolveResult.ToAll(_, trace) =>
-        assert(trace.events.collect { case com.barrybecker4.graph.algorithms.shortestpaths.SearchEvent.Settled(v) => v } ==
+        assert(trace.events.collect { case com.barrybecker4.graph.algorithms.shortestpaths.SearchEvent.Settled(v, _) => v } ==
           Vector(0, 1, 2))
       case other => fail(s"expected ToAll, got $other")
     }
@@ -141,5 +142,35 @@ class LiveSolverSuite extends AnyFunSuite {
       case SolveResult.OnePath(path, _) => assert(path == Path.EMPTY_PATH)
       case other => fail(s"expected OnePath, got $other")
     }
+  }
+
+  test("Bidirectional Dijkstra returns the s-t path and a non-empty trace") {
+    val result = LiveSolver.solve(triangle, SolveRequest(BidirectionalDijkstra, 0, 2, 3))
+    result match {
+      case SolveResult.OnePath(path, trace) =>
+        assert(path == Path(3.0, List(0, 1, 2)))
+        assert(trace.events.nonEmpty)
+      case other => fail(s"expected OnePath, got $other")
+    }
+  }
+
+  test("ALT returns the s-t path and a non-empty trace") {
+    val result = LiveSolver.solve(triangle, SolveRequest(Alt, 0, 2, 3))
+    result match {
+      case SolveResult.OnePath(path, trace) =>
+        assert(path == Path(3.0, List(0, 1, 2)))
+        assert(trace.events.nonEmpty)
+      case other => fail(s"expected OnePath, got $other")
+    }
+  }
+
+  test("A* without locations fails validation") {
+    assert(LiveSolver.validate(triangle, SolveRequest(AStar, 0, 2, 3)) ==
+      Left("A* needs node locations"))
+  }
+
+  test("A* on sp_4_2 with locations validates") {
+    val graph = GraphTstUtil.getGraph("sp_4_2")
+    assert(LiveSolver.validate(graph, SolveRequest(AStar, 0, 2, 3)).isRight)
   }
 }

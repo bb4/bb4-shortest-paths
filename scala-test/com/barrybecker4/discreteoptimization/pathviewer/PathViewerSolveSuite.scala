@@ -103,7 +103,7 @@ class PathViewerSolveSuite extends AnyFunSuite {
       assert(bar.statusText == "Dijkstra vs ModifiedDijkstra: same target cost")
 
       bar.clickShowOther()
-      assert(bar.statusText.startsWith("Modified 0 → 2"))
+      assert(bar.statusText.startsWith("ModifiedDijkstra 0 → 2"))
       bar.clickShowOther()
       assert(bar.statusText.startsWith("Dijkstra path to 2"))
 
