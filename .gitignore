@@ -8,6 +8,7 @@ bin/
 *.class
 *.log
 .idea
+.worktrees
 *.iml
 *.iws
 *.ipr
