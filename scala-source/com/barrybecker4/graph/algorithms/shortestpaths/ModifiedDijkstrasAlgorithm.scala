@@ -42,12 +42,36 @@ class ModifiedDijkstrasAlgorithm(graph: DirectedGraph) {
 
   private val vertexCandidateQueue = DijkstraHeap()
   private var predecessorMap: Map[Int, Int] = Map()
+  private var edgeToMap: Map[Int, DirectedEdge] = Map()
 
   def clear(): Unit = {
     determinedVertexSet.clear()
     vertexCandidateQueue.clear()
     distanceTo.clear()
     predecessorMap = Map()
+    edgeToMap = Map()
+  }
+
+  def findShortestPaths(source: Int): ShortestPaths = {
+    val isOppositeDirection = false
+    determineShortestPaths(source, -1, isOppositeDirection)
+    
+    val shortestPaths = ShortestPaths(graph.numVertices, source)
+    
+    val visited = mutable.Set[Int](source)
+    val queue = mutable.Queue[Int](source)
+    
+    while (queue.nonEmpty) {
+      val current = queue.dequeue()
+      for (v <- 0 until graph.numVertices 
+           if !visited.contains(v) && predecessorMap.get(v).contains(current)) {
+        visited += v
+        queue.enqueue(v)
+        edgeToMap.get(v).foreach(shortestPaths.useEdge)
+      }
+    }
+    
+    shortestPaths
   }
 
   def getShortestPath(source: Int, destination: Int): Option[Path] = {
@@ -66,8 +90,9 @@ class ModifiedDijkstrasAlgorithm(graph: DirectedGraph) {
   def getStartVertexDistance(vertex: Int): Double = 
     distanceTo.getOrElse(vertex, Double.MaxValue)
     
-  def setPredecessor(vertex: Int, predecessor: Int): Unit = 
+  def setPredecessor(vertex: Int, predecessor: Int): Unit = {
     predecessorMap += vertex -> predecessor
+  }
 
   private def getPath(source: Int, destination: Int): List[Int] = {
     if (source == destination)
@@ -113,6 +138,7 @@ class ModifiedDijkstrasAlgorithm(graph: DirectedGraph) {
           if (!distanceTo.contains(next) || distance < distanceTo(next)) {
             distanceTo.put(next, distance)
             predecessorMap += next -> node
+            edgeToMap += next -> nextEdge
             vertexCandidateQueue.enqueue(next, distance)
           }
         })

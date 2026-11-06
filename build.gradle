@@ -18,6 +18,9 @@ test {
         System.getProperty('shortestpaths.updateFixtures', 'false')
     systemProperty 'shortestpaths.includeSlow',
         System.getProperty('shortestpaths.includeSlow', 'false')
+    // Allow headless mode for GUI tests in CI
+    systemProperty 'java.awt.headless',
+        System.getProperty('java.awt.headless', 'false')
 }
 
 tasks.register('benchmark', JavaExec) {
