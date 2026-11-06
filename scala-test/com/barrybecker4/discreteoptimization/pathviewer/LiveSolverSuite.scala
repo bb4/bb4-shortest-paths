@@ -64,14 +64,47 @@ class LiveSolverSuite extends AnyFunSuite {
     }
   }
 
+  test("Eppstein returns the same two 0-to-2 paths as Yen on a DAG triangle") {
+    val result = LiveSolver.solve(triangle, SolveRequest(Eppstein, 0, 2, 2))
+    result match {
+      case SolveResult.KPaths(solution) =>
+        assert(solution.shortestPaths.map(_.weight) == Seq(3.0, 4.0))
+        assert(solution.shortestPaths.map(_.nodes) == Seq(List(0, 1, 2), List(0, 2)))
+      case other => fail(s"expected KPaths, got $other")
+    }
+  }
+
+  test("Eppstein returns non-simple walks on a cycle graph") {
+    val cycle = DirectedGraph(
+      3,
+      IndexedSeq(
+        DirectedEdge(0, 1, 1.0),
+        DirectedEdge(1, 2, 1.0),
+        DirectedEdge(0, 2, 10.0),
+        DirectedEdge(1, 0, 1.0)
+      )
+    )
+    val result = LiveSolver.solve(cycle, SolveRequest(Eppstein, 0, 2, 3))
+    result match {
+      case SolveResult.KPaths(solution) =>
+        assert(solution.shortestPaths.map(_.weight) == Seq(2.0, 4.0, 6.0))
+      case other => fail(s"expected KPaths, got $other")
+    }
+  }
+
   test("rejects a target outside the graph, Yen with source == target, and k outside 1..10") {
     assert(LiveSolver.validate(triangle, SolveRequest(Dijkstra, 0, 9, 3)) ==
       Left("Target must be from 0 to 2"))
     assert(LiveSolver.validate(triangle, SolveRequest(Yen, 1, 1, 3)) ==
       Left("Yen needs different source and target"))
+    assert(LiveSolver.validate(triangle, SolveRequest(Eppstein, 1, 1, 1)).isRight)
     assert(LiveSolver.validate(triangle, SolveRequest(Yen, 0, 2, 0)) ==
       Left("k must be from 1 to 10"))
     assert(LiveSolver.validate(triangle, SolveRequest(Yen, 0, 2, 11)) ==
+      Left("k must be from 1 to 10"))
+    assert(LiveSolver.validate(triangle, SolveRequest(Eppstein, 0, 2, 0)) ==
+      Left("k must be from 1 to 10"))
+    assert(LiveSolver.validate(triangle, SolveRequest(Eppstein, 0, 2, 11)) ==
       Left("k must be from 1 to 10"))
   }
 

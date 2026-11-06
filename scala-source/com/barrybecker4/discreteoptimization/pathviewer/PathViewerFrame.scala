@@ -4,7 +4,7 @@ import com.barrybecker4.graph.directed.DirectedGraphParser
 import com.barrybecker4.graph.visualization.{GraphStreamAdapter, GraphViewerFrame}
 import com.barrybecker4.discreteoptimization.kshortestpaths.KShortestPathsTstUtil
 import com.barrybecker4.discreteoptimization.kshortestpaths.model.KShortestPathsSolution
-import com.barrybecker4.discreteoptimization.kshortestpaths.solver.YensKPathsSolver
+import com.barrybecker4.discreteoptimization.kshortestpaths.solver.{EppsteinsKPathsSolver, YensKPathsSolver}
 import com.barrybecker4.discreteoptimization.pathviewer.PathViewerFrame.{K_SHORTEST_PATHS_PREFIX, SHORTEST_PATHS_PREFIX}
 import com.barrybecker4.discreteoptimization.pathviewer.render.{AnimatedShortestPathRenderer, KShortestPathRenderer, PathColors, PathRenderer, PlaybackControl, ShortestPathRenderer}
 import com.barrybecker4.discreteoptimization.shortestpaths.ShortestPathsTstUtil
@@ -278,7 +278,7 @@ class PathViewerFrame extends GraphViewerFrame() {
         setSummary(onePathStatus(request, path))
       case SolveResult.KPaths(solution) =>
         showKShortestPaths(solution, stream)
-        setSummary(f"Yen k=${solution.k} total ${solution.totalCost}%.4g")
+        setSummary(f"${request.algorithm} k=${solution.k} total ${solution.totalCost}%.4g")
     }
   }
 
@@ -354,7 +354,8 @@ class PathViewerFrame extends GraphViewerFrame() {
     val suffixes = Seq(
       s"_${ModifiedDijkstrasPathSolver.BASE_NAME}_solution",
       s"_${DijkstrasPathSolver.BASE_NAME}_solution",
-      s"_${YensKPathsSolver.BASE_NAME}_solution"
+      s"_${YensKPathsSolver.BASE_NAME}_solution",
+      s"_${EppsteinsKPathsSolver.BASE_NAME}_solution"
     )
     suffixes.map(fileName.indexOf).find(_ >= 0)
       .getOrElse(throw new IllegalArgumentException("Invalid fileName: " + fileName))

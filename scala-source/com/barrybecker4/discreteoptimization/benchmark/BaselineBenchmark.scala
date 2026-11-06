@@ -1,7 +1,7 @@
 package com.barrybecker4.discreteoptimization.benchmark
 
 import com.barrybecker4.discreteoptimization.kshortestpaths.KShortestPathsTstUtil
-import com.barrybecker4.discreteoptimization.kshortestpaths.solver.YensKPathsSolver
+import com.barrybecker4.discreteoptimization.kshortestpaths.solver.{EppsteinsKPathsSolver, YensKPathsSolver}
 import com.barrybecker4.discreteoptimization.shortestpaths.ShortestPathsTstUtil
 import com.barrybecker4.discreteoptimization.shortestpaths.solver.{DijkstrasPathSolver, ModifiedDijkstrasPathSolver}
 import com.barrybecker4.graph.GraphTstUtil
@@ -88,6 +88,27 @@ object BaselineBenchmark {
           failures += s"${bench.graph}: Yen first-path cost ${first.weight} != Dijkstra cost $dijkstraCost to ${bench.yenDestination}"
         case None if !dijkstraCost.isPosInfinity =>
           failures += s"${bench.graph}: Yen found no path to ${bench.yenDestination} but Dijkstra cost is $dijkstraCost"
+        case _ => ()
+      }
+
+      val (eppstein, eppsteinMs) = measure(warmup) {
+        EppsteinsKPathsSolver().findPaths(graph, 0, bench.yenDestination, bench.yenK)
+      }
+      emit(
+        rows, bench, "eppsteins_kpaths", Some(bench.yenDestination), Some(bench.yenK),
+        warmup, eppsteinMs, eppstein.totalCost, eppstein.shortestPaths.size
+      )
+      checkGolden(
+        failures,
+        s"${bench.graph} eppsteins_kpaths",
+        eppstein.toString + "\n",
+        KShortestPathsTstUtil.getSerializedSolution(s"${bench.graph}_eppsteins_kpaths_solution.txt")
+      )
+      eppstein.shortestPaths.headOption match {
+        case Some(first) if !PathCosts.sameCost(first.weight, dijkstraCost) =>
+          failures += s"${bench.graph}: Eppstein first-path cost ${first.weight} != Dijkstra cost $dijkstraCost to ${bench.yenDestination}"
+        case None if !dijkstraCost.isPosInfinity =>
+          failures += s"${bench.graph}: Eppstein found no path to ${bench.yenDestination} but Dijkstra cost is $dijkstraCost"
         case _ => ()
       }
     }

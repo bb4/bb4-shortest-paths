@@ -1,7 +1,7 @@
 package com.barrybecker4.discreteoptimization.pathviewer
 
 import com.barrybecker4.discreteoptimization.kshortestpaths.model.KShortestPathsSolution
-import com.barrybecker4.discreteoptimization.kshortestpaths.solver.YensKPathsSolver
+import com.barrybecker4.discreteoptimization.kshortestpaths.solver.{EppsteinsKPathsSolver, YensKPathsSolver}
 import com.barrybecker4.discreteoptimization.shortestpaths.model.ShortestPathsSolution
 import com.barrybecker4.discreteoptimization.shortestpaths.solver.{DijkstrasPathSolver, ModifiedDijkstrasPathSolver}
 import com.barrybecker4.graph.Path
@@ -9,7 +9,7 @@ import com.barrybecker4.graph.algorithms.shortestpaths.{SearchObserver, SearchTr
 import com.barrybecker4.graph.directed.DirectedGraph
 
 enum AlgorithmKind {
-  case Dijkstra, ModifiedDijkstra, Yen
+  case Dijkstra, ModifiedDijkstra, Yen, Eppstein
 }
 
 case class SolveRequest(algorithm: AlgorithmKind, source: Int, target: Int, k: Int)
@@ -39,10 +39,13 @@ object LiveSolver {
       Left(s"Target must be from 0 to $maxId")
     else if (request.algorithm == AlgorithmKind.Yen && request.source == request.target)
       Left("Yen needs different source and target")
-    else if (request.algorithm == AlgorithmKind.Yen && (request.k < 1 || request.k > 10))
+    else if (usesK(request.algorithm) && (request.k < 1 || request.k > 10))
       Left("k must be from 1 to 10")
     else Right(request)
   }
+
+  def usesK(algorithm: AlgorithmKind): Boolean =
+    algorithm == AlgorithmKind.Yen || algorithm == AlgorithmKind.Eppstein
 
   /** Caller must pass a request that `validate` accepts. */
   def solve(graph: DirectedGraph, request: SolveRequest): SolveResult =
@@ -59,6 +62,10 @@ object LiveSolver {
         SolveResult.OnePath(path, observer.trace)
       case AlgorithmKind.Yen =>
         val solution = new YensKPathsSolver(request.k)
+          .findPaths(graph, request.source, request.target, request.k)
+        SolveResult.KPaths(solution)
+      case AlgorithmKind.Eppstein =>
+        val solution = new EppsteinsKPathsSolver(request.k)
           .findPaths(graph, request.source, request.target, request.k)
         SolveResult.KPaths(solution)
     }

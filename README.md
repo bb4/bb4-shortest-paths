@@ -5,7 +5,8 @@
 Some shortest path algorithm implementations and visualizations.
  - Dijkstra's algorithm - single-source shortest paths 
  - ModifiedDijkstra's - shortest path between two nodes
- - Yen's algorithm - finds the K shortest paths between two nodes
+ - Yen's algorithm - finds the k shortest loopless paths between two nodes
+ - Eppstein's algorithm - finds the k shortest paths between two nodes (vertices may repeat)
 
 A GraphViewerApp is also provided. It allows you to view the graph test cases.
 
@@ -19,9 +20,9 @@ Run ./gradlew to build and run the tests.
 ./gradlew test -Dshortestpaths.includeSlow=true
 ```
 
-`./gradlew benchmark` times Dijkstra, Modified Dijkstra, and Yen on the smoke fixtures (`tiny_graph_*`, `sp_4_*`, `sp_10_1`), the medium graphs (`sp_400`, `sp_500`, `sp_700`), and `road_network_01`. It prints a table and rewrites `benchmarks/baseline/baseline.csv`. The task fails if path costs disagree or a golden file does not match. It does not fail because a timing changed. Large cases are timed once, without a warmup run.
+`./gradlew benchmark` times Dijkstra, Modified Dijkstra, Yen, and Eppstein on the smoke fixtures (`tiny_graph_*`, `sp_4_*`, `sp_10_1`), the medium graphs (`sp_400`, `sp_500`, `sp_700`), and `road_network_01`. It prints a table and rewrites `benchmarks/baseline/baseline.csv`. The task fails if path costs disagree or a golden file does not match. It does not fail because a timing changed. Large cases are timed once, without a warmup run.
 
-The default application is PathViewer. File → Open Graph loads a graph, and the Solve bar runs Dijkstra (all targets), Modified Dijkstra (the chosen source and target only), or Yen (k shortest paths, k from 1 to 10). File → Open Shortest Paths and File → Open K Shortest Paths still open the golden solution files. Compare runs a second algorithm on the same source, target, and k, then Show other swaps which result is drawn. The status line says whether the two target costs match.
+The default application is PathViewer. File → Open Graph loads a graph, and the Solve bar runs Dijkstra (all targets), Modified Dijkstra (the chosen source and target only), Yen (k shortest loopless paths, k from 1 to 10), or Eppstein (k shortest walks that may repeat vertices, k from 1 to 10). File → Open Shortest Paths and File → Open K Shortest Paths still open the golden solution files. Compare runs a second algorithm on the same source, target, and k, then Show other swaps which result is drawn. The status line says whether the two target costs match.
 For example, here is a shortest path result for sp_120 example. For Dijkstras and ModifiedDijkstras, you can mouse over a node to see the shortest path to that node.
 
 ![Mouse over to see shortest path to node](images/sp_120_dijkstra_solution.png)
@@ -30,7 +31,9 @@ For Yen's and Eppstein's algorithms, you can mouse over nodes or edges to see th
 ![Mouse over to see shortest path to node out of k-paths](images/sp_100_1_yens-k-shortest-paths.png)
 
 Future Features
- - add other variations of Eppsteins algorithm.
+ - Feng’s node-classification algorithm for k shortest simple paths (Networks, 2014)
+ - Kurz and Mutzel sidetrack-based algorithm for k shortest simple paths (ISAAC 2016)
+ - Al Zoobi, Coudert, and Nisse — Finding the k Shortest Simple Paths: Time and Space Trade-offs (ACM JEA, 2023)
 
 
 
