@@ -30,6 +30,9 @@ case class ShortestPaths(numNodes: Int, source: Int) {
   def previousNode(node: Int): Option[Int] = 
     if (edgeTo(node).isDefined) Some(edgeTo(node).get.source) else None
 
+  /** Predecessor edge on the path tree, if the vertex has been reached. */
+  def edgeToVertex(vertex: Int): Option[DirectedEdge] = edgeTo(vertex)
+
   def pathToVertex(vertex: Int): Path =
     Path(distToVertex(vertex), pathNodesToVertex(vertex))
   

@@ -10,6 +10,10 @@ import scala.collection.mutable
  * Point-to-point Dijkstra that grows a forward search from the source and a
  * reverse search from the destination, stopping when the sum of live queue keys
  * meets or exceeds the best meeting path cost μ.
+ *
+ * Requires non-negative edge weights. A negative weight makes the result undefined;
+ * this algorithm does not detect negative cycles. Use [[BellmanFordAlgorithm]] when
+ * a weight may be negative.
  */
 class BidirectionalDijkstrasAlgorithm(graph: DirectedGraph) {
 

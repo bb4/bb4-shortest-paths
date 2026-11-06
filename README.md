@@ -3,9 +3,10 @@
 📊 [Build status for all bb4 projects](https://github.com/bb4/.github)
 
 Some shortest path algorithm implementations and visualizations.
- - Dijkstra's algorithm - single-source shortest paths 
- - ModifiedDijkstra's - shortest path between two nodes
- - Bidirectional Dijkstra - point-to-point search from both ends
+ - Dijkstra's algorithm - single-source shortest paths (non-negative weights)
+ - ModifiedDijkstra's - shortest path between two nodes (non-negative weights)
+ - Bidirectional Dijkstra - point-to-point search from both ends (non-negative weights)
+ - Bellman–Ford - single-source shortest paths with negative weights; reports reachable negative cycles
  - A* - goal-directed search with a scaled Euclidean potential (graphs with locations)
  - ALT - A* with landmark triangle-inequality potentials
  - Yen's algorithm - finds the k shortest loopless paths between two nodes

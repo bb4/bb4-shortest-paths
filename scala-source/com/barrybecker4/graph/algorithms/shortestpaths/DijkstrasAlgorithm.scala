@@ -8,6 +8,10 @@ import scala.annotation.tailrec
 /**
  * Find the shortest path in a weighted directed graph using Dijkstra's algorithm.
  * Complexity should be O (V + E log V) because we are using a min-priority queue.
+ *
+ * Requires non-negative edge weights. A negative weight makes the result undefined;
+ * this algorithm does not detect negative cycles. Use [[BellmanFordAlgorithm]] when
+ * a weight may be negative.
  */
 class DijkstrasAlgorithm(graph: DirectedGraph) extends ShortestPathsFinder {
 

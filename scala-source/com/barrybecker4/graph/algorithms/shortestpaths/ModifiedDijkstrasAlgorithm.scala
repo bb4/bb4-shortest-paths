@@ -14,6 +14,10 @@ import scala.collection.mutable
  * It allows finding a shortest path from a source to a single destination instead of all destinations at once.
  * Implementation based on https://github.com/yan-qi/k-shortest-paths-scala-version
  *
+ * Requires non-negative edge weights. A negative weight makes the result undefined;
+ * this algorithm does not detect negative cycles. Use [[BellmanFordAlgorithm]] when
+ * a weight may be negative.
+ *
  * See https://github.com/yan-qi/k-shortest-paths-scala-version
  * From https://www.adrian.idv.hk/2011-05-18-y71-shortestpath/
  * Complexity should be O (V + E log V)  because we are using a minPriority queue.
