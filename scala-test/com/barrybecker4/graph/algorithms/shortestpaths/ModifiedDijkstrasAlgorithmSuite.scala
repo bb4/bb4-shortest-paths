@@ -65,6 +65,30 @@ class ModifiedDijkstrasAlgorithmSuite extends AnyFunSuite {
     assert(alg.getStartVertexDistance(0) == 3.0)
   }
 
+  /**
+   * 0→2 (1), 2→1 (14), 2→3 (7), 3→1 (6). The best path to 1 is 0-2-3-1 (14).
+   * A queue ordered by a mutable distance map settles 1 via 0-2-1 (15) first.
+   */
+  test("decrease-key keeps the shorter path when the same vertex is enqueued twice") {
+    val graph = DirectedGraph(
+      4,
+      IndexedSeq(
+        DirectedEdge(3, 2, 8),
+        DirectedEdge(2, 1, 14),
+        DirectedEdge(1, 0, 4),
+        DirectedEdge(0, 1, 16),
+        DirectedEdge(0, 3, 19),
+        DirectedEdge(2, 3, 7),
+        DirectedEdge(3, 1, 6),
+        DirectedEdge(0, 2, 1)
+      )
+    )
+    val alg = ModifiedDijkstrasAlgorithm(graph)
+    assert(alg.getShortestPath(0, 1).contains(Path(14.0, List(0, 2, 3, 1))))
+    assert(alg.getShortestPath(0, 2).contains(Path(1.0, List(0, 2))))
+    assert(alg.getShortestPath(0, 3).contains(Path(8.0, List(0, 2, 3))))
+  }
+
   test("correctCostBackward relaxes incoming chain") {
     val g = DirectedGraph(3, IndexedSeq(DirectedEdge(0, 1, 1.0), DirectedEdge(1, 2, 4.0)))
     val alg = ModifiedDijkstrasAlgorithm(g)

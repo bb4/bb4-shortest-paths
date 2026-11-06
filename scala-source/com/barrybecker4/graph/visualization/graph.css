@@ -3,7 +3,6 @@ graph {
   fill-color: #efffff;
 }
 
-/* .node:not(.node#0)*/
 node {
   shape: circle;
   size: 20px, 20px;
@@ -76,8 +75,8 @@ edge.highlighted {
   z-index: 10;
 }
 
-/* custom styling for first node */
-node#0 {
+/* Applied to whichever vertex was chosen as the path source. */
+node.source {
   size: 23px, 23px;
   stroke-width: 3px;
   stroke-color: #bb0000;

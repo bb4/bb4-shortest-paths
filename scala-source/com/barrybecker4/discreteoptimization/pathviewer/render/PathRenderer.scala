@@ -14,6 +14,18 @@ import java.util
 object PathRenderer {
   val ANIMATION_DELAY = 20
   val PAUSE = 100
+
+  /**
+   * Keep `source` after a render class is applied. The render class comes first
+   * so it overrides shared source properties; `source` still fills the rest.
+   */
+  def mergeUiClass(existing: Option[String], uiClass: String): String = {
+    val keepSource = existing.exists(value => value.split(',').iterator.map(_.trim).contains("source"))
+    val classes =
+      (if (uiClass.nonEmpty) List(uiClass) else Nil) ++
+        (if (keepSource) List("source") else Nil)
+    classes.mkString(", ")
+  }
 }
 
 trait PathRenderer(graph: MultiGraph, viewer: Viewer) {
@@ -72,6 +84,13 @@ trait PathRenderer(graph: MultiGraph, viewer: Viewer) {
     if (animationDelay == 0) viewerPipe.pump()
   }
   
+  protected def setNodeClass(node: Node, uiClass: String): Unit = {
+    val existing =
+      if (node.hasAttribute("ui.class")) Some(node.getAttribute("ui.class", classOf[String]))
+      else None
+    node.setAttribute("ui.class", PathRenderer.mergeUiClass(existing, uiClass))
+  }
+
   /** color paths containing nodeIdx */
   def colorPaths(nodeIdx: Int, uiClass: UiClass): Unit
 

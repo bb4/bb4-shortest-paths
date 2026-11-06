@@ -22,6 +22,13 @@ class KShortestPathRendererSuite extends AnyFunSuite {
     assert(selected.map(_._1) == Seq(paths.head, paths(2), paths(5)))
   }
 
+  test("render classes override shared source styles and keep the source class") {
+    assert(PathRenderer.mergeUiClass(Some("source"), "visited") == "visited, source")
+    assert(PathRenderer.mergeUiClass(Some("visited, source"), "last") == "last, source")
+    assert(PathRenderer.mergeUiClass(Some("source"), "") == "source")
+    assert(PathRenderer.mergeUiClass(None, "visited") == "visited")
+  }
+
   test("renders paths with non-contiguous vertex IDs") {
     val edges = IndexedSeq(
       DirectedEdge(10, 20, 1.0),

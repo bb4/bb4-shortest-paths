@@ -27,15 +27,20 @@ case class GraphStreamAdapter(digraph: DirectedGraph) {
 
   private val isLarge = digraph.edges.size > LARGE_GRAPH_THRESH
 
-  def createGraph(): MultiGraph = {
+  def createGraph(sourceVertex: Int = 0): MultiGraph = {
     val graph = new MultiGraph("Some Graph")
 
     addNodesToGraph(graph)
     addEdgesToGraph(graph)
+    markSource(graph, sourceVertex)
     graph.setAttribute("ui.stylesheet", GraphStreamAdapter.loadStyleSheet())
     graph.setAttribute("ui.antialias", true)
     graph
   }
+
+  private def markSource(graph: MultiGraph, sourceVertex: Int): Unit =
+    if (sourceVertex >= 0 && sourceVertex < digraph.numVertices)
+      graph.getNode(sourceVertex.toString).setAttribute("ui.class", "source")
 
   private def addNodesToGraph(graph: MultiGraph): Unit = {
     val vertexIds = digraph.edges.flatMap(e => Seq(e.source, e.destination)).distinct.sorted

@@ -39,8 +39,15 @@ class ModifiedDijkstrasAlgorithm(graph: DirectedGraph) {
 
   private val determinedVertexSet: mutable.Set[Int] = mutable.Set.empty
   private val distanceTo: mutable.Map[Int, Double] = mutable.Map()
-  private val vertexCandidateQueue: mutable.PriorityQueue[Int] =
-    mutable.PriorityQueue.empty(using Ordering.by(distanceTo).reverse)
+
+  /**
+   * Scala's priority queue is a max-heap. Negating the queued distance makes
+   * dequeue return the smallest one. The distance is stored on the entry so
+   * later writes to `distanceTo` do not reorder elements already in the heap.
+   * A vertex can be enqueued more than once; stale entries are ignored.
+   */
+  private val vertexCandidateQueue: mutable.PriorityQueue[(Int, Double)] =
+    mutable.PriorityQueue.empty(using Ordering.by[(Int, Double), Double](entry => -entry._2))
   private var predecessorMap: Map[Int, Int] = Map()
 
   def clear(): Unit = {
@@ -93,9 +100,11 @@ class ModifiedDijkstrasAlgorithm(graph: DirectedGraph) {
   @tailrec
   private def updateVertex (end: Int, isOpposite: Boolean): Unit = {
     if (vertexCandidateQueue.nonEmpty) {
-      val node: Int = vertexCandidateQueue.dequeue()
+      val (node, distQueued) = vertexCandidateQueue.dequeue()
+      val best = distanceTo.getOrElse(node, Double.MaxValue)
+      val fresh = !determinedVertexSet.contains(node) && sameDistance(distQueued, best)
 
-      if (node != end) {
+      if (fresh && node != end) {
         determinedVertexSet += node
         val neighborSet = if (isOpposite) graph.incomingNeighborsOf(node) else graph.outgoingNeighborsOf(node)
 
@@ -110,20 +119,24 @@ class ModifiedDijkstrasAlgorithm(graph: DirectedGraph) {
           if (!distanceTo.contains(next) || distance < distanceTo(next)) {
             distanceTo.put(next, distance)
             predecessorMap += next -> node
-            vertexCandidateQueue += next
+            vertexCandidateQueue.enqueue((next, distance))
           }
         })
-        updateVertex(end, isOpposite)
       }
+      if (!fresh || node != end)
+        updateVertex(end, isOpposite)
     }
   }
+
+  private def sameDistance(queued: Double, best: Double): Boolean =
+    queued == best || (queued - best).abs < 1e-12
 
   private def determineShortestPaths(source: Int, destination: Int, isOpposite: Boolean): Unit = {
     clear()
     val end = if (isOpposite) source else destination
     val start = if (isOpposite) destination else source
     distanceTo.put(start, 0d)
-    vertexCandidateQueue += start
+    vertexCandidateQueue.enqueue((start, 0d))
     updateVertex(end, isOpposite)
   }
 

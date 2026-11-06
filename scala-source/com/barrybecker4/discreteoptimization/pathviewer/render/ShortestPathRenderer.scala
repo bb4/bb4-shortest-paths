@@ -23,10 +23,8 @@ case class ShortestPathRenderer(graph: MultiGraph, solution: ShortestPathsSoluti
 
   def colorPath(path: Path, uiClass: UiClass, animationDelay: Int = ANIMATION_DELAY): Unit =
     walkPath(path, animationDelay) { (node, _, isLast) =>
-      if (isLast && uiClass.isHighlight)
-        node.setAttribute("ui.class", "last")
-      else
-        node.setAttribute("ui.class", uiClass.name)
+      val name = if (isLast && uiClass.isHighlight) "last" else uiClass.name
+      setNodeClass(node, name)
     } { edge =>
       edge.setAttribute("ui.class", uiClass.name)
     }

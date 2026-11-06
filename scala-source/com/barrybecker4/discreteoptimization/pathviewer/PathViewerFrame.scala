@@ -58,8 +58,8 @@ class PathViewerFrame extends GraphViewerFrame() {
       val selectedFile = fileChooser.getSelectedFile
       println("selected file is " + selectedFile.getName)
 
-      val graph = loadTheGraph(selectedFile)
       val solution = ShortestPathsTstUtil.getSolution(selectedFile.getName)
+      val graph = loadTheGraph(selectedFile, sourceVertex(solution))
 
       // then load the shortest paths
       showShortestPaths(solution, graph)
@@ -75,21 +75,29 @@ class PathViewerFrame extends GraphViewerFrame() {
       val selectedFile = fileChooser.getSelectedFile
       println("selected file is " + selectedFile.getName)
 
-      val graph = loadTheGraph(selectedFile)
       val solution = KShortestPathsTstUtil.getSolution(selectedFile.getName)
+      val graph = loadTheGraph(selectedFile, sourceVertex(solution))
 
       // then load the shortest paths
       showKShortestPaths(solution, graph)
     }
   }
 
-  private def loadTheGraph(file: File): MultiGraph = {
+  private def loadTheGraph(file: File, sourceVertex: Int): MultiGraph = {
     val graphName = getGraphName(file.getName)
     val digraph = loadGraphFromName(graphName)
-    val graph = GraphStreamAdapter(digraph).createGraph()
+    val graph = GraphStreamAdapter(digraph).createGraph(sourceVertex)
     setGraph(graph, file.getName)
     graph
   }
+
+  private def sourceVertex(solution: ShortestPathsSolution): Int =
+    solution.paths.zipWithIndex.collectFirst {
+      case (path, vertex) if path.weight == 0.0 && path.nodes == List(vertex) => vertex
+    }.getOrElse(0)
+
+  private def sourceVertex(solution: KShortestPathsSolution): Int =
+    solution.shortestPaths.view.flatMap(_.nodes.headOption).headOption.getOrElse(0)
 
   private def showShortestPaths(solution: ShortestPathsSolution, graph: MultiGraph): Unit = {
 
