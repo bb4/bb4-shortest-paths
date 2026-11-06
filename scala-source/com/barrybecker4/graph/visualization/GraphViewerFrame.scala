@@ -2,7 +2,7 @@ package com.barrybecker4.graph.visualization
 
 import com.barrybecker4.graph.GraphTstUtil
 import com.barrybecker4.graph.directed.{DirectedGraph, DirectedGraphParser}
-import com.barrybecker4.graph.visualization.GraphViewerFrame.{PARSER, PREFIX}
+import com.barrybecker4.graph.visualization.GraphViewerFrame.{PARSER, PREFIX, VIEWER_LOCK}
 import com.barrybecker4.graph.visualization.{GraphStreamAdapter, GraphViewer}
 import org.graphstream.graph.Graph
 import org.graphstream.ui.layout.springbox.implementations.{LinLog, SpringBox}
@@ -18,6 +18,7 @@ import scala.io.Source
 object GraphViewerFrame {
   private val PREFIX = GraphTstUtil.PREFIX
   private val PARSER: DirectedGraphParser = DirectedGraphParser()
+  private val VIEWER_LOCK = new Object
 }
 
 class GraphViewerFrame extends JFrame("Graph Viewer") {
@@ -47,26 +48,34 @@ class GraphViewerFrame extends JFrame("Graph Viewer") {
   }
 
   override def dispose(): Unit = {
-    if (viewer != null) viewer.close()
-    super.dispose()
+    VIEWER_LOCK.synchronized {
+      if (viewer != null) {
+        val view = viewer.getDefaultView
+        if (view != null) remove(view.asInstanceOf[java.awt.Component])
+        viewer.close()
+      }
+      super.dispose()
+    }
   }
 
   protected def setGraph(graph: Graph, title: String): Unit = {
-    if (viewer != null) {
-      val view = viewer.getDefaultView
-      if (view != null) remove(view.asInstanceOf[java.awt.Component])
-      viewer.close()
+    VIEWER_LOCK.synchronized {
+      if (viewer != null) {
+        val view = viewer.getDefaultView
+        if (view != null) remove(view.asInstanceOf[java.awt.Component])
+        viewer.close()
+      }
+      viewer = new GraphViewer(graph)
+      this.setTitle(title)
+
+      // If the graph nodes have location data, don't use an layout
+      if (graph.getNode(0).hasAttribute("xy")) viewer.disableAutoLayout()
+      else viewer.enableAutoLayout(SpringBox()) //SpringBox()) // LinLog()
+
+      add(viewer.getViewPanel)
+      this.repaint()
+      setVisible(true)
     }
-    viewer = new GraphViewer(graph)
-    this.setTitle(title)
-
-    // If the graph nodes have location data, don't use an layout
-    if (graph.getNode(0).hasAttribute("xy")) viewer.disableAutoLayout()
-    else viewer.enableAutoLayout(SpringBox()) //SpringBox()) // LinLog()
-
-    add(viewer.getViewPanel)
-    this.repaint()
-    setVisible(true)
   }
 
   protected def loadGraph(): Unit = {
@@ -77,9 +86,13 @@ class GraphViewerFrame extends JFrame("Graph Viewer") {
     if (returnValue == JFileChooser.APPROVE_OPTION) {
       val selectedFile = fileChooser.getSelectedFile
       val digraph = loadGraphFromFile(selectedFile)
-      val graph = GraphStreamAdapter(digraph).createGraph()
-      setGraph(graph, selectedFile.getName)
+      presentDigraph(digraph, selectedFile.getName)
     }
+  }
+
+  protected def presentDigraph(digraph: DirectedGraph, title: String, sourceVertex: Int = 0): Unit = {
+    val graph = GraphStreamAdapter(digraph).createGraph(sourceVertex)
+    setGraph(graph, title)
   }
 
   protected def loadGraphFromFile(file: File): DirectedGraph = {

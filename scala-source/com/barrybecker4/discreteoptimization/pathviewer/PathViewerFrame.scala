@@ -12,9 +12,12 @@ import com.barrybecker4.discreteoptimization.pathviewer.render.KShortestPathRend
 import com.barrybecker4.discreteoptimization.shortestpaths.ShortestPathsTstUtil
 import com.barrybecker4.discreteoptimization.shortestpaths.model.ShortestPathsSolution
 import com.barrybecker4.discreteoptimization.shortestpaths.solver.{DijkstrasPathSolver, ModifiedDijkstrasPathSolver}
+import com.barrybecker4.graph.Path
+import com.barrybecker4.graph.directed.DirectedGraph
 import org.graphstream.graph.Graph
 import org.graphstream.graph.implementations.MultiGraph
 
+import java.awt.BorderLayout
 import java.io.File
 import javax.swing.*
 
@@ -30,6 +33,11 @@ object PathViewerFrame {
 class PathViewerFrame extends GraphViewerFrame() {
 
   private var activeRenderer: Option[PathRenderer] = None
+  private var loaded: Option[DirectedGraph] = None
+  private val solveBar = new SolveBar(solve, _ => ())
+  getContentPane.add(solveBar, BorderLayout.NORTH)
+
+  private[pathviewer] def loadedGraph: Option[DirectedGraph] = loaded
 
   override protected def setGraph(graph: Graph, title: String): Unit = {
     stopActiveRenderer()
@@ -49,8 +57,10 @@ class PathViewerFrame extends GraphViewerFrame() {
   override protected def createMenu(): Unit = {
     val myMenuBar: JMenuBar = new JMenuBar()
     val fileMenu = new JMenu("File")
+    val openGraphItem = createOpenItemOption()
     val openShortestPathsItem = createOpenShortestPathsItemOption()
     val openKShortestPathsItem = createOpenKShortestPathsItemOption()
+    fileMenu.add(openGraphItem)
     fileMenu.add(openShortestPathsItem)
     fileMenu.add(openKShortestPathsItem)
     myMenuBar.add(fileMenu)
@@ -105,10 +115,106 @@ class PathViewerFrame extends GraphViewerFrame() {
   private def loadTheGraph(file: File, sourceVertex: Int): MultiGraph = {
     val graphName = getGraphName(file.getName)
     val digraph = loadGraphFromName(graphName)
+    loaded = Some(digraph)
+    solveBar.setVertexRange(LiveSolver.maxVertexId(digraph))
+    solveBar.setSource(sourceVertex)
     val graph = GraphStreamAdapter(digraph).createGraph(sourceVertex)
     setGraph(graph, file.getName)
     graph
   }
+
+  override protected def presentDigraph(
+    digraph: DirectedGraph,
+    title: String,
+    sourceVertex: Int = 0
+  ): Unit = {
+    loaded = Some(digraph)
+    solveBar.setVertexRange(LiveSolver.maxVertexId(digraph))
+    solveBar.setSource(sourceVertex)
+    super.presentDigraph(digraph, title, sourceVertex)
+  }
+
+  private[pathviewer] def solve(request: SolveRequest): Unit = {
+    val digraph = loaded match {
+      case None =>
+        solveBar.setStatus("Open a graph first")
+        return
+      case Some(graph) => graph
+    }
+    LiveSolver.validate(digraph, request) match {
+      case Left(message) =>
+        solveBar.setStatus(message)
+      case Right(valid) =>
+        solveBar.setBusy(true)
+        val worker = new SwingWorker[SolveResult, java.lang.Void] {
+          override def doInBackground(): SolveResult = LiveSolver.solve(digraph, valid)
+          override def done(): Unit = {
+            solveBar.setBusy(false)
+            try showSolved(valid, get())
+            catch {
+              case _: java.util.concurrent.CancellationException => ()
+              case ex: java.util.concurrent.ExecutionException =>
+                solveBar.setStatus(ex.getCause.toString)
+            }
+          }
+        }
+        worker.execute()
+    }
+  }
+
+  private[pathviewer] def solveNow(request: SolveRequest): Unit = {
+    val digraph = loaded.getOrElse(throw new IllegalStateException("Open a graph first"))
+    val valid = LiveSolver.validate(digraph, request)
+      .fold(message => throw new IllegalArgumentException(message), identity)
+    showSolved(valid, LiveSolver.solve(digraph, valid))
+    waitForSourceInViewer(valid.source)
+  }
+
+  private def waitForSourceInViewer(source: Int): Unit = {
+    val deadline = System.nanoTime() + 3_000_000_000L
+    var ready = false
+    while (!ready && System.nanoTime() < deadline) {
+      val node = viewer.getGraphicGraph.getNode(source.toString)
+      ready = node != null && node.getAttribute("ui.class", classOf[String]) == "source"
+      if (!ready) Thread.sleep(1)
+    }
+  }
+
+  private def showSolved(request: SolveRequest, result: SolveResult): Unit = {
+    val digraph = loaded.get
+    val stream = GraphStreamAdapter(digraph).createGraph(request.source)
+    setGraph(stream, titleFor(request))
+    result match {
+      case SolveResult.ToAll(solution, _) =>
+        showShortestPaths(solution, stream)
+        solveBar.setStatus(dijkstraStatus(request, solution))
+      case SolveResult.OnePath(path, _) =>
+        val solution = ShortestPathsSolution(path.weight, List(path))
+        showShortestPaths(solution, stream)
+        solveBar.setStatus(onePathStatus(request, path))
+      case SolveResult.KPaths(solution) =>
+        showKShortestPaths(solution, stream)
+        solveBar.setStatus(f"Yen k=${solution.k} total ${solution.totalCost}%.4g")
+    }
+  }
+
+  private def titleFor(request: SolveRequest): String =
+    s"${request.algorithm} ${request.source} → ${request.target}"
+
+  private def dijkstraStatus(request: SolveRequest, solution: ShortestPathsSolution): String = {
+    val toTarget = solution.paths.find(path => path.nodes.nonEmpty && path.lastNode == request.target)
+    val targetText = toTarget match {
+      case Some(path) if !path.weight.isPosInfinity => f"path to ${request.target}: ${path.weight}%.4g"
+      case _ => s"no path to ${request.target}"
+    }
+    s"Dijkstra $targetText"
+  }
+
+  private def onePathStatus(request: SolveRequest, path: Path): String =
+    if (path.nodes.isEmpty || path.weight.isPosInfinity)
+      s"Modified: no path ${request.source} → ${request.target}"
+    else
+      f"Modified ${request.source} → ${request.target}: ${path.weight}%.4g ${path.nodes.mkString(" ")}"
 
   private def sourceVertex(solution: ShortestPathsSolution): Int =
     solution.paths.zipWithIndex.collectFirst {

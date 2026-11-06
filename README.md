@@ -21,7 +21,7 @@ Run ./gradlew to build and run the tests.
 
 `./gradlew benchmark` times Dijkstra, Modified Dijkstra, and Yen on the smoke fixtures (`tiny_graph_*`, `sp_4_*`, `sp_10_1`), the medium graphs (`sp_400`, `sp_500`, `sp_700`), and `road_network_01`. It prints a table and rewrites `benchmarks/baseline/baseline.csv`. The task fails if path costs disagree or a golden file does not match. It does not fail because a timing changed. Large cases are timed once, without a warmup run.
 
-The default application is the GraphViewerApp. It allows you to view the graph tests cases and their results.
+The default application is PathViewer. File → Open Graph loads a graph, and the Solve bar runs Dijkstra (all targets), Modified Dijkstra (the chosen source and target only), or Yen (k shortest paths, k from 1 to 10). File → Open Shortest Paths and File → Open K Shortest Paths still open the golden solution files.
 For example, here is a shortest path result for sp_120 example. For Dijkstras and ModifiedDijkstras, you can mouse over a node to see the shortest path to that node.
 
 ![Mouse over to see shortest path to node](images/sp_120_dijkstra_solution.png)
