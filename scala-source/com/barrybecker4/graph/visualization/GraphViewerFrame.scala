@@ -49,22 +49,29 @@ class GraphViewerFrame extends JFrame("Graph Viewer") {
 
   override def dispose(): Unit = {
     VIEWER_LOCK.synchronized {
-      if (viewer != null) {
-        val view = viewer.getDefaultView
-        if (view != null) remove(view.asInstanceOf[java.awt.Component])
-        viewer.close()
-      }
+      closeViewer()
       super.dispose()
     }
   }
 
+  /**
+   * GraphStream can throw from StyleGroup.removeRenderer when close races
+   * the graph thread. The view is already going away, so that NPE is ignored.
+   */
+  private def closeViewer(): Unit = {
+    if (viewer == null) return
+    val view = viewer.getDefaultView
+    if (view != null) remove(view.asInstanceOf[java.awt.Component])
+    try viewer.close()
+    catch {
+      case _: NullPointerException => ()
+    }
+    viewer = null
+  }
+
   protected def setGraph(graph: Graph, title: String): Unit = {
     VIEWER_LOCK.synchronized {
-      if (viewer != null) {
-        val view = viewer.getDefaultView
-        if (view != null) remove(view.asInstanceOf[java.awt.Component])
-        viewer.close()
-      }
+      closeViewer()
       viewer = new GraphViewer(graph)
       this.setTitle(title)
 
