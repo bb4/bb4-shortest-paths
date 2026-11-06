@@ -3,9 +3,9 @@ package com.barrybecker4.discreteoptimization.pathviewer
 import com.barrybecker4.discreteoptimization.kshortestpaths.model.KShortestPathsSolution
 import com.barrybecker4.discreteoptimization.kshortestpaths.solver.YensKPathsSolver
 import com.barrybecker4.discreteoptimization.shortestpaths.model.ShortestPathsSolution
-import com.barrybecker4.discreteoptimization.shortestpaths.solver.DijkstrasPathSolver
+import com.barrybecker4.discreteoptimization.shortestpaths.solver.{DijkstrasPathSolver, ModifiedDijkstrasPathSolver}
 import com.barrybecker4.graph.Path
-import com.barrybecker4.graph.algorithms.shortestpaths.{ModifiedDijkstrasAlgorithm, SearchTrace}
+import com.barrybecker4.graph.algorithms.shortestpaths.{SearchObserver, SearchTrace}
 import com.barrybecker4.graph.directed.DirectedGraph
 
 enum AlgorithmKind {
@@ -46,13 +46,15 @@ object LiveSolver {
   def solve(graph: DirectedGraph, request: SolveRequest): SolveResult =
     request.algorithm match {
       case AlgorithmKind.Dijkstra =>
-        val solution = new DijkstrasPathSolver().findPaths(graph, request.source)
-        SolveResult.ToAll(solution, SearchTrace.empty)
+        val observer = SearchObserver.recording()
+        val solution = new DijkstrasPathSolver().findPaths(graph, request.source, observer)
+        SolveResult.ToAll(solution, observer.trace)
       case AlgorithmKind.ModifiedDijkstra =>
-        val path = new ModifiedDijkstrasAlgorithm(graph)
-          .getShortestPath(request.source, request.target)
+        val observer = SearchObserver.recording()
+        val path = new ModifiedDijkstrasPathSolver()
+          .findPath(graph, request.source, request.target, observer)
           .getOrElse(Path.EMPTY_PATH)
-        SolveResult.OnePath(path, SearchTrace.empty)
+        SolveResult.OnePath(path, observer.trace)
       case AlgorithmKind.Yen =>
         val solution = new YensKPathsSolver(request.k)
           .findPaths(graph, request.source, request.target, request.k)

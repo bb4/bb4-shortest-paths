@@ -1,7 +1,7 @@
 package com.barrybecker4.discreteoptimization.shortestpaths.solver
 
 import com.barrybecker4.graph.Path
-import com.barrybecker4.graph.algorithms.shortestpaths.ModifiedDijkstrasAlgorithm
+import com.barrybecker4.graph.algorithms.shortestpaths.{ModifiedDijkstrasAlgorithm, SearchObserver}
 import com.barrybecker4.graph.directed.DirectedGraph
 import com.barrybecker4.discreteoptimization.shortestpaths.model.ShortestPathsSolution
 
@@ -29,5 +29,13 @@ class ModifiedDijkstrasPathSolver extends ShortestPathsSolver {
 
     solution
   }
+
+  def findPath(
+      graph: DirectedGraph,
+      source: Int,
+      destination: Int,
+      observer: SearchObserver = SearchObserver.None
+  ): Option[Path] =
+    new ModifiedDijkstrasAlgorithm(graph).getShortestPath(source, destination, observer)
 
 }

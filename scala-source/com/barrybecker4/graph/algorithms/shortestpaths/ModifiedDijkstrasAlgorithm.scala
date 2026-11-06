@@ -74,11 +74,8 @@ class ModifiedDijkstrasAlgorithm(graph: DirectedGraph) {
     shortestPaths
   }
 
-  def getShortestPath(source: Int, destination: Int): Option[Path] = {
-
-    val isOppositeDirection = false
-    determineShortestPaths(source, destination, isOppositeDirection)
-
+  def getShortestPath(source: Int, destination: Int, observer: SearchObserver = SearchObserver.None): Option[Path] = {
+    determineShortestPaths(source, destination, isOpposite = false, observer)
     if (distanceTo.contains(destination))
       Some(Path(distanceTo(destination), getPath(source, destination)))
     else None
@@ -116,14 +113,18 @@ class ModifiedDijkstrasAlgorithm(graph: DirectedGraph) {
   }
 
   @tailrec
-  private def updateVertex(end: Int, isOpposite: Boolean): Unit = {
+  private def updateVertex(end: Int, isOpposite: Boolean, observer: SearchObserver): Unit = {
     vertexCandidateQueue.extractMin { (node, distQueued) =>
       !determinedVertexSet.contains(node) &&
         DijkstraHeap.sameDistance(distQueued, distanceTo.getOrElse(node, Double.MaxValue))
     } match {
       case None => ()
-      case Some(node) if node == end => ()
+      case Some(node) if node == end =>
+        observer.extracted(node)
+        observer.settled(node)
       case Some(node) =>
+        observer.extracted(node)
+        observer.settled(node)
         determinedVertexSet += node
         val neighborSet = if (isOpposite) graph.incomingNeighborsOf(node) else graph.outgoingNeighborsOf(node)
 
@@ -140,19 +141,26 @@ class ModifiedDijkstrasAlgorithm(graph: DirectedGraph) {
             predecessorMap += next -> node
             edgeToMap += next -> nextEdge
             vertexCandidateQueue.enqueue(next, distance)
+            observer.frontier(next, distance)
           }
         })
-        updateVertex(end, isOpposite)
+        updateVertex(end, isOpposite, observer)
     }
   }
 
-  private def determineShortestPaths(source: Int, destination: Int, isOpposite: Boolean): Unit = {
+  private def determineShortestPaths(
+      source: Int,
+      destination: Int,
+      isOpposite: Boolean,
+      observer: SearchObserver
+  ): Unit = {
     clear()
     val end = if (isOpposite) source else destination
     val start = if (isOpposite) destination else source
     distanceTo.put(start, 0d)
     vertexCandidateQueue.enqueue(start, 0d)
-    updateVertex(end, isOpposite)
+    observer.frontier(start, 0d)
+    updateVertex(end, isOpposite, observer)
   }
 
   /**
@@ -161,7 +169,7 @@ class ModifiedDijkstrasAlgorithm(graph: DirectedGraph) {
    * @param root the node as the root
    */
   def findShortestPathFlowerRootAt(root: Int): Unit =
-    determineShortestPaths(-1, root, isOpposite = true)
+    determineShortestPaths(-1, root, isOpposite = true, SearchObserver.None)
 
   /**
    * Correct costs of successors of the input vertex using backward star form.

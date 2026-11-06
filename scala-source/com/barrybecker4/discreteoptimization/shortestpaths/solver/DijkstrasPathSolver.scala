@@ -1,6 +1,6 @@
 package com.barrybecker4.discreteoptimization.shortestpaths.solver
 
-import com.barrybecker4.graph.algorithms.shortestpaths.DijkstrasAlgorithm
+import com.barrybecker4.graph.algorithms.shortestpaths.{DijkstrasAlgorithm, SearchObserver}
 import com.barrybecker4.graph.directed.DirectedGraph
 import com.barrybecker4.discreteoptimization.shortestpaths.model.ShortestPathsSolution
 
@@ -17,15 +17,17 @@ class DijkstrasPathSolver extends ShortestPathsSolver {
   var graph: DirectedGraph = uninitialized
 
   /** Single-source shortest paths from `sourceVertex` to every vertex. */
-  def findPaths(graph: DirectedGraph, sourceVertex: Int): ShortestPathsSolution = {
+  override def findPaths(graph: DirectedGraph, sourceVertex: Int): ShortestPathsSolution =
+    findPaths(graph, sourceVertex, SearchObserver.None)
 
-    val pathCalc = new DijkstrasAlgorithm(graph).findShortestPaths(sourceVertex)
-
+  def findPaths(
+      graph: DirectedGraph,
+      sourceVertex: Int,
+      observer: SearchObserver
+  ): ShortestPathsSolution = {
+    val pathCalc = new DijkstrasAlgorithm(graph).findShortestPaths(sourceVertex, observer)
     val paths = Range(0, graph.numVertices).map(pathCalc.pathToVertex).toList
-    val totalCost = paths.map(_.weight).sum
-    val solution = ShortestPathsSolution(totalCost, paths)
-
-    solution
+    ShortestPathsSolution(paths.map(_.weight).sum, paths)
   }
 
 }

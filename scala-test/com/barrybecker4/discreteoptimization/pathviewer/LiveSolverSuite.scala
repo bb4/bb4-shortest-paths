@@ -33,9 +33,25 @@ class LiveSolverSuite extends AnyFunSuite {
     }
   }
 
-  test("Modified Dijkstra returns only the s-t path") {
+  test("Modified Dijkstra returns only the s-t path and a non-empty trace") {
     val result = LiveSolver.solve(triangle, SolveRequest(ModifiedDijkstra, 0, 2, 3))
-    assert(result == SolveResult.OnePath(Path(3.0, List(0, 1, 2)), com.barrybecker4.graph.algorithms.shortestpaths.SearchTrace.empty))
+    result match {
+      case SolveResult.OnePath(path, trace) =>
+        assert(path == Path(3.0, List(0, 1, 2)))
+        assert(trace.events.collect { case com.barrybecker4.graph.algorithms.shortestpaths.SearchEvent.Settled(v) => v } ==
+          Vector(0, 1, 2))
+      case other => fail(s"expected OnePath, got $other")
+    }
+  }
+
+  test("Dijkstra solve keeps a trace whose settled order is 0, 1, 2") {
+    val result = LiveSolver.solve(triangle, SolveRequest(Dijkstra, 0, 2, 3))
+    result match {
+      case SolveResult.ToAll(_, trace) =>
+        assert(trace.events.collect { case com.barrybecker4.graph.algorithms.shortestpaths.SearchEvent.Settled(v) => v } ==
+          Vector(0, 1, 2))
+      case other => fail(s"expected ToAll, got $other")
+    }
   }
 
   test("Yen returns two loopless 0-to-2 paths, cheapest first") {
@@ -62,6 +78,9 @@ class LiveSolverSuite extends AnyFunSuite {
   test("Modified Dijkstra with no path returns the empty path") {
     val graph = DirectedGraph(2, IndexedSeq(DirectedEdge(0, 1, 1.0)))
     val result = LiveSolver.solve(graph, SolveRequest(ModifiedDijkstra, 1, 0, 3))
-    assert(result == SolveResult.OnePath(Path.EMPTY_PATH, com.barrybecker4.graph.algorithms.shortestpaths.SearchTrace.empty))
+    result match {
+      case SolveResult.OnePath(path, _) => assert(path == Path.EMPTY_PATH)
+      case other => fail(s"expected OnePath, got $other")
+    }
   }
 }
