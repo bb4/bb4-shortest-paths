@@ -18,7 +18,7 @@ For example, here is a shortest path result for sp_120 example. For Dijkstras an
 
 ![Mouse over to see shortest path to node](images/sp_120_dijkstra_solution.png)
 ![Mouse over to see shortest path to node](images/network_dijkstra_solution.png)</br></br>
-For Yens and Eppsteins algorithm, you can mouse over nodes or edges to see the shortest paths that pass through that respective node or edge. There is a different color for each of the k-shortest paths found.
+For Yen's and Eppstein's algorithms, you can mouse over nodes or edges to see the shortest paths that pass through that respective node or edge. There is a different color for each of the k-shortest paths found.
 ![Mouse over to see shortest path to node out of k-paths](images/sp_100_1_yens-k-shortest-paths.png)
 
 Future Features
