@@ -25,6 +25,7 @@ class PathViewerSolveSuite extends AnyFunSuite {
       frame.load(triangle)
       assert(frame.graphLoaded.contains(triangle))
 
+      frame.useAnimation(false)
       frame.run(SolveRequest(AlgorithmKind.Dijkstra, 2, 0, 3))
 
       val graph = frame.viewer.getGraphicGraph
@@ -42,6 +43,7 @@ class PathViewerSolveSuite extends AnyFunSuite {
     frame.setVisible(false)
     try {
       frame.load(triangle)
+      frame.useAnimation(false)
       frame.run(SolveRequest(AlgorithmKind.ModifiedDijkstra, 2, 0, 3))
       val graph = frame.viewer.getGraphicGraph
       assert(graph.getNode("2").getAttribute("ui.class", classOf[String]) == "source")
@@ -88,6 +90,7 @@ class PathViewerSolveSuite extends AnyFunSuite {
     def load(digraph: DirectedGraph): Unit = presentDigraph(digraph, "triangle", 0)
     def presentGraph(digraph: DirectedGraph, title: String, source: Int): Unit =
       presentDigraph(digraph, title, source)
+    def useAnimation(on: Boolean): Unit = setAnimate(on)
     def run(request: SolveRequest): Unit = solveNow(request)
     def graphLoaded: Option[DirectedGraph] = loadedGraph
   }

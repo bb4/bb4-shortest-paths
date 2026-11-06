@@ -1,6 +1,7 @@
 package com.barrybecker4.discreteoptimization.pathviewer
 
 import com.barrybecker4.discreteoptimization.pathviewer.AlgorithmKind.*
+import com.barrybecker4.discreteoptimization.pathviewer.render.PlaybackControl
 
 import java.awt.FlowLayout
 import javax.swing.*
@@ -13,9 +14,15 @@ class SolveBar(onSolve: SolveRequest => Unit, onCompare: Option[AlgorithmKind] =
   private val target = new JSpinner(new SpinnerNumberModel(0, 0, 0, 1))
   private val k = new JSpinner(new SpinnerNumberModel(3, 1, 10, 1))
   private val solveButton = new JButton("Solve")
+  private val animate = new JCheckBox("Animate")
+  private val playButton = new JButton("Play")
+  private val pauseButton = new JButton("Pause")
+  private val stepButton = new JButton("Step")
+  private val skipButton = new JButton("Skip")
   private val compareBox = new JCheckBox("Compare")
   private val compareAlgorithmBox = new JComboBox[AlgorithmKind](Array(Dijkstra, ModifiedDijkstra, Yen))
   private val status = new JLabel("Open a graph, then Solve")
+  private var playback: PlaybackControl = new PlaybackControl
 
   compareBox.setEnabled(false)
   compareAlgorithmBox.setEnabled(false)
@@ -23,6 +30,10 @@ class SolveBar(onSolve: SolveRequest => Unit, onCompare: Option[AlgorithmKind] =
 
   algorithm.addActionListener(_ => k.setEnabled(algorithm.getSelectedItem == Yen))
   solveButton.addActionListener(_ => onSolve(selectedRequest()))
+  playButton.addActionListener(_ => playback.play())
+  pauseButton.addActionListener(_ => playback.pause())
+  stepButton.addActionListener(_ => playback.step())
+  skipButton.addActionListener(_ => playback.skip())
   compareBox.addActionListener(_ => onCompare(this.compareAlgorithm()))
 
   add(new JLabel("Algorithm"))
@@ -34,6 +45,11 @@ class SolveBar(onSolve: SolveRequest => Unit, onCompare: Option[AlgorithmKind] =
   add(new JLabel("k"))
   add(k)
   add(solveButton)
+  add(animate)
+  add(playButton)
+  add(pauseButton)
+  add(stepButton)
+  add(skipButton)
   add(compareBox)
   add(compareAlgorithmBox)
   add(status)
@@ -49,6 +65,12 @@ class SolveBar(onSolve: SolveRequest => Unit, onCompare: Option[AlgorithmKind] =
   def setStatus(text: String): Unit = status.setText(text)
 
   def setBusy(busy: Boolean): Unit = solveButton.setEnabled(!busy)
+
+  def bindPlayback(control: PlaybackControl): Unit = playback = control
+
+  def animateSelected: Boolean = animate.isSelected
+
+  def setAnimateDefault(on: Boolean): Unit = animate.setSelected(on)
 
   private[pathviewer] def selectAlgorithm(kind: AlgorithmKind): Unit = algorithm.setSelectedItem(kind)
 

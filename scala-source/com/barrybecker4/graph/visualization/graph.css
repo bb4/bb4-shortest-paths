@@ -90,3 +90,16 @@ node.last {
   text-color: #aa0044;
   z-index: 12;
 }
+
+node.frontier {
+  fill-color: #ffe08a;
+  stroke-color: #c48a00;
+  stroke-width: 2px;
+}
+
+node.current {
+  fill-color: #ffb347;
+  stroke-color: #cc5500;
+  stroke-width: 3px;
+  z-index: 15;
+}

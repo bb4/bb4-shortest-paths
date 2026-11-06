@@ -6,9 +6,7 @@ import com.barrybecker4.discreteoptimization.kshortestpaths.KShortestPathsTstUti
 import com.barrybecker4.discreteoptimization.kshortestpaths.model.KShortestPathsSolution
 import com.barrybecker4.discreteoptimization.kshortestpaths.solver.YensKPathsSolver
 import com.barrybecker4.discreteoptimization.pathviewer.PathViewerFrame.{K_SHORTEST_PATHS_PREFIX, SHORTEST_PATHS_PREFIX}
-import com.barrybecker4.discreteoptimization.pathviewer.render.PathRenderer
-import com.barrybecker4.discreteoptimization.pathviewer.render.ShortestPathRenderer
-import com.barrybecker4.discreteoptimization.pathviewer.render.KShortestPathRenderer
+import com.barrybecker4.discreteoptimization.pathviewer.render.{AnimatedShortestPathRenderer, KShortestPathRenderer, PathRenderer, PlaybackControl, ShortestPathRenderer}
 import com.barrybecker4.discreteoptimization.shortestpaths.ShortestPathsTstUtil
 import com.barrybecker4.discreteoptimization.shortestpaths.model.ShortestPathsSolution
 import com.barrybecker4.discreteoptimization.shortestpaths.solver.{DijkstrasPathSolver, ModifiedDijkstrasPathSolver}
@@ -121,6 +119,7 @@ class PathViewerFrame extends GraphViewerFrame() {
     loaded = Some(digraph)
     solveBar.setVertexRange(LiveSolver.maxVertexId(digraph))
     solveBar.setSource(sourceVertex)
+    solveBar.setAnimateDefault(digraph.edges.size <= GraphStreamAdapter.LARGE_GRAPH_THRESH)
     val graph = GraphStreamAdapter(digraph).createGraph(sourceVertex)
     setGraph(graph, file.getName)
     graph
@@ -134,6 +133,7 @@ class PathViewerFrame extends GraphViewerFrame() {
     loaded = Some(digraph)
     solveBar.setVertexRange(LiveSolver.maxVertexId(digraph))
     solveBar.setSource(sourceVertex)
+    solveBar.setAnimateDefault(digraph.edges.size <= GraphStreamAdapter.LARGE_GRAPH_THRESH)
     super.presentDigraph(digraph, title, sourceVertex)
   }
 
@@ -196,17 +196,29 @@ class PathViewerFrame extends GraphViewerFrame() {
     val stream = GraphStreamAdapter(digraph).createGraph(request.source)
     setGraph(stream, titleFor(request))
     result match {
-      case SolveResult.ToAll(solution, _) =>
-        showShortestPaths(solution, stream)
+      case SolveResult.ToAll(solution, trace) =>
+        showShortestPaths(solution, stream, trace)
         solveBar.setStatus(dijkstraStatus(request, solution))
-      case SolveResult.OnePath(path, _) =>
+      case SolveResult.OnePath(path, trace) =>
         val solution = ShortestPathsSolution(path.weight, List(path))
-        showShortestPaths(solution, stream)
+        showShortestPaths(solution, stream, trace)
         solveBar.setStatus(onePathStatus(request, path))
       case SolveResult.KPaths(solution) =>
         showKShortestPaths(solution, stream)
         solveBar.setStatus(f"Yen k=${solution.k} total ${solution.totalCost}%.4g")
     }
+  }
+
+  private def showShortestPaths(
+      solution: ShortestPathsSolution,
+      graph: MultiGraph,
+      trace: com.barrybecker4.graph.algorithms.shortestpaths.SearchTrace
+  ): Unit = {
+    if (solveBar.animateSelected && trace.events.nonEmpty) {
+      val control = new PlaybackControl
+      solveBar.bindPlayback(control)
+      activate(new AnimatedShortestPathRenderer(graph, solution, viewer, trace, control))
+    } else showShortestPaths(solution, graph)
   }
 
   private def titleFor(request: SolveRequest): String =
@@ -240,6 +252,8 @@ class PathViewerFrame extends GraphViewerFrame() {
 
   protected def showKShortestPaths(solution: KShortestPathsSolution, graph: MultiGraph): Unit =
     activate(KShortestPathRenderer(graph, solution, viewer))
+
+  private[pathviewer] def setAnimate(on: Boolean): Unit = solveBar.setAnimateDefault(on)
 
   private def activate(renderer: PathRenderer): Unit = {
     activeRenderer = Some(renderer)
