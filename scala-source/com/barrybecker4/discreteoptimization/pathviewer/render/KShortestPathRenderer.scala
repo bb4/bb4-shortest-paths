@@ -12,6 +12,13 @@ import org.graphstream.graph.implementations.MultiGraph
 import java.awt.Color
 
 
+object KShortestPathRenderer {
+
+  /** Paths at `indices`, which need not be contiguous. */
+  def pathsAt(paths: Seq[Path], indices: Seq[Int]): Seq[(Path, Int)] =
+    indices.map(index => (paths(index), index))
+}
+
 case class KShortestPathRenderer(graph: MultiGraph, solution: KShortestPathsSolution, viewer: GraphViewer)
   extends PathRenderer(graph, viewer) {
 
@@ -35,14 +42,9 @@ case class KShortestPathRenderer(graph: MultiGraph, solution: KShortestPathsSolu
   }
   
   private def colorPaths(pathIndices: Seq[Int], uiClass: UiClass): Unit = {
-    if (pathIndices.nonEmpty) {
-      var ct = pathIndices.head
-      val paths = solution.shortestPaths.slice(ct, ct + pathIndices.length)
-      for (path <- paths) {
-        if (uiClass == PLAIN || uiClass == LARGE) colorPath(path, uiClass, 0)
-        else colorPath(path, uiClass, 0, Some(getColor(ct)))
-        ct += 1
-      }
+    for ((path, index) <- KShortestPathRenderer.pathsAt(solution.shortestPaths, pathIndices)) {
+      if (uiClass == PLAIN || uiClass == LARGE) colorPath(path, uiClass, 0)
+      else colorPath(path, uiClass, 0, Some(getColor(index)))
     }
   }
 

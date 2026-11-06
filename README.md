@@ -13,6 +13,14 @@ A GraphViewerApp is also provided. It allows you to view the graph test cases.
 
 Run ./gradlew to build and run the tests.
 
+`./gradlew test` stays on the fast suites. `road_network_01` is tagged slow and runs only when you opt in:
+
+```
+./gradlew test -Dshortestpaths.includeSlow=true
+```
+
+`./gradlew benchmark` times Dijkstra, Modified Dijkstra, and Yen on the smoke fixtures (`tiny_graph_*`, `sp_4_*`, `sp_10_1`), the medium graphs (`sp_400`, `sp_500`, `sp_700`), and `road_network_01`. It prints a table and rewrites `benchmarks/baseline/baseline.csv`. The task fails if path costs disagree or a golden file does not match. It does not fail because a timing changed. Large cases are timed once, without a warmup run.
+
 The default application is the GraphViewerApp. It allows you to view the graph tests cases and their results.
 For example, here is a shortest path result for sp_120 example. For Dijkstras and ModifiedDijkstras, you can mouse over a node to see the shortest path to that node.
 

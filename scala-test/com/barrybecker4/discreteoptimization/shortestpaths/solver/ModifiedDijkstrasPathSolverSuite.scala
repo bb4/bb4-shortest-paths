@@ -1,6 +1,7 @@
 package com.barrybecker4.discreteoptimization.shortestpaths.solver
 
-import _root_.com.barrybecker4.discreteoptimization.shortestpaths.solver.{BaseSolverSuite, ModifiedDijkstrasPathSolver, ShortestPathsSolver}
+import com.barrybecker4.discreteoptimization.SlowTest
+import com.barrybecker4.discreteoptimization.shortestpaths.solver.{BaseSolverSuite, ModifiedDijkstrasPathSolver, ShortestPathsSolver}
 
 class ModifiedDijkstrasPathSolverSuite extends BaseSolverSuite {
 
@@ -149,10 +150,11 @@ class ModifiedDijkstrasPathSolverSuite extends BaseSolverSuite {
     verify("tiny_graph_02")
   }
 
-  // Takes lions share of time at 90s - much more than regular dijkstras
-  //  test("road_network_01") {
-  //    verify("road_network_01")
-  //  }
+  // About 90s. Skipped unless -Dshortestpaths.includeSlow=true (see ./gradlew benchmark).
+  test("road_network_01", SlowTest) {
+    assume(SlowTest.include, "skipped unless -Dshortestpaths.includeSlow=true")
+    verify("road_network_01")
+  }
   
 
 

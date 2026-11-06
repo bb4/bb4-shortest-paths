@@ -16,6 +16,16 @@ bb4 {
 test {
     systemProperty 'shortestpaths.updateFixtures',
         System.getProperty('shortestpaths.updateFixtures', 'false')
+    systemProperty 'shortestpaths.includeSlow',
+        System.getProperty('shortestpaths.includeSlow', 'false')
+}
+
+tasks.register('benchmark', JavaExec) {
+    group = 'verification'
+    description = 'Accuracy and performance baseline, including road_network_01. Not part of test.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.barrybecker4.discreteoptimization.benchmark.BaselineBenchmark'
+    dependsOn tasks.named('classes')
 }
 
 dependencies {

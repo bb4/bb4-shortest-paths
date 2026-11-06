@@ -22,7 +22,7 @@ class DijkstrasPathSolver extends ShortestPathsSolver {
    */
   def findPaths(graph: DirectedGraph, sourceVertex: Int): ShortestPathsSolution = {
 
-    val pathCalc = new DijkstrasAlgorithm(graph).findShortestPaths(0)
+    val pathCalc = new DijkstrasAlgorithm(graph).findShortestPaths(sourceVertex)
 
     val paths = Range(0, graph.numVertices).map(pathCalc.pathToVertex).toList
     val totalCost = paths.map(_.weight).sum

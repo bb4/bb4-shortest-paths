@@ -1,8 +1,7 @@
 package com.barrybecker4.discreteoptimization.kshortestpaths.solver
 
-import _root_.com.barrybecker4.graph.algorithms.kshortestpaths.YensAlgorithm
-import _root_.com.barrybecker4.discreteoptimization.kshortestpaths.solver.BaseSolverSuite
-import _root_.com.barrybecker4.discreteoptimization.kshortestpaths.solver.{KShortestPathsSolver, YensKPathsSolver}
+import com.barrybecker4.discreteoptimization.SlowTest
+import com.barrybecker4.discreteoptimization.kshortestpaths.solver.{BaseSolverSuite, KShortestPathsSolver, YensKPathsSolver}
 
 class YensKPathsSolverSuite extends BaseSolverSuite {
 
@@ -147,10 +146,11 @@ class YensKPathsSolverSuite extends BaseSolverSuite {
     verify("tiny_graph_02", 8, 2)
   }
 
-  // This takes the lion's share of the time at 36s
-  //  test("road_network_01") {
-  //    verify("road_network_01", 11000, 3)
-  //  }
+  // Skipped unless -Dshortestpaths.includeSlow=true (see ./gradlew benchmark).
+  test("road_network_01", SlowTest) {
+    assume(SlowTest.include, "skipped unless -Dshortestpaths.includeSlow=true")
+    verify("road_network_01", 11000, 3)
+  }
 
 
   override def createSolver(): KShortestPathsSolver = YensKPathsSolver(2)

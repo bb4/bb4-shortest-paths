@@ -28,4 +28,11 @@ class YensAlgorithmSuite extends AnyFunSuite {
     val paths = YensAlgorithm(line).findKShortestPaths(0, 1, 5)
     assert(paths.size == 1)
   }
+
+  test("k = 1 returns only the unique shortest path") {
+    val paths = YensAlgorithm(twoPathGraph).findKShortestPaths(0, 3, 1)
+    assert(paths.size == 1)
+    assert(paths.head.weight == 3.0)
+    assert(paths.head.nodes == List(0, 2, 3))
+  }
 }

@@ -27,6 +27,37 @@ class ModifiedDijkstrasAlgorithmSuite extends AnyFunSuite {
     assert(alg.getShortestPath(0, 1).isEmpty)
   }
 
+  test("getShortestPath honors a non-zero source") {
+    val graph = DirectedGraph(
+      3,
+      IndexedSeq(DirectedEdge(0, 1, 1.0), DirectedEdge(1, 2, 1.0))
+    )
+    val alg = ModifiedDijkstrasAlgorithm(graph)
+    assert(alg.getShortestPath(1, 2).contains(Path(1.0, List(1, 2))))
+    assert(alg.getShortestPath(1, 0).isEmpty)
+  }
+
+  test("single-vertex graph costs 0") {
+    val alg = ModifiedDijkstrasAlgorithm(DirectedGraph(1, IndexedSeq.empty))
+    assert(alg.getShortestPath(0, 0).contains(Path(0.0, List(0))))
+  }
+
+  test("picks the cheaper of two parallel edges") {
+    val graph = DirectedGraph(
+      2,
+      IndexedSeq(DirectedEdge(0, 1, 5.0), DirectedEdge(0, 1, 1.0))
+    )
+    assert(ModifiedDijkstrasAlgorithm(graph).getShortestPath(0, 1).contains(Path(1.0, List(0, 1))))
+  }
+
+  test("zero-weight edges are allowed") {
+    val graph = DirectedGraph(
+      3,
+      IndexedSeq(DirectedEdge(0, 1, 0.0), DirectedEdge(1, 2, 0.0))
+    )
+    assert(ModifiedDijkstrasAlgorithm(graph).getShortestPath(0, 2).contains(Path(0.0, List(0, 1, 2))))
+  }
+
   test("flower rooted at target records distances toward root") {
     val alg = ModifiedDijkstrasAlgorithm(simple)
     alg.findShortestPathFlowerRootAt(2)
