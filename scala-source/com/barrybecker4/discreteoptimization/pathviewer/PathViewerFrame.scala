@@ -19,6 +19,7 @@ import org.graphstream.graph.implementations.MultiGraph
 
 import java.awt.BorderLayout
 import java.io.File
+import java.util.concurrent.{CancellationException, ExecutionException}
 import javax.swing.*
 
 
@@ -149,12 +150,22 @@ class PathViewerFrame extends GraphViewerFrame() {
         val worker = new SwingWorker[SolveResult, java.lang.Void] {
           override def doInBackground(): SolveResult = LiveSolver.solve(digraph, valid)
           override def done(): Unit = {
-            solveBar.setBusy(false)
-            try showSolved(valid, get())
-            catch {
-              case _: java.util.concurrent.CancellationException => ()
-              case ex: java.util.concurrent.ExecutionException =>
+            val graphAtSolveStart = digraph
+            val discardMsg = "Solve discarded because the graph changed"
+            try {
+              val result = get()
+              if (!loaded.contains(graphAtSolveStart)) solveBar.setStatus(discardMsg)
+              else showSolved(graphAtSolveStart, valid, result)
+            } catch {
+              case _: CancellationException => ()
+              case _: InterruptedException =>
+                Thread.currentThread().interrupt()
+              case ex: ExecutionException =>
                 solveBar.setStatus(ex.getCause.toString)
+              case ex: Exception =>
+                solveBar.setStatus(ex.toString)
+            } finally {
+              solveBar.setBusy(false)
             }
           }
         }
@@ -166,7 +177,7 @@ class PathViewerFrame extends GraphViewerFrame() {
     val digraph = loaded.getOrElse(throw new IllegalStateException("Open a graph first"))
     val valid = LiveSolver.validate(digraph, request)
       .fold(message => throw new IllegalArgumentException(message), identity)
-    showSolved(valid, LiveSolver.solve(digraph, valid))
+    showSolved(digraph, valid, LiveSolver.solve(digraph, valid))
     waitForSourceInViewer(valid.source)
   }
 
@@ -180,8 +191,7 @@ class PathViewerFrame extends GraphViewerFrame() {
     }
   }
 
-  private def showSolved(request: SolveRequest, result: SolveResult): Unit = {
-    val digraph = loaded.get
+  private def showSolved(digraph: DirectedGraph, request: SolveRequest, result: SolveResult): Unit = {
     val stream = GraphStreamAdapter(digraph).createGraph(request.source)
     setGraph(stream, titleFor(request))
     result match {
