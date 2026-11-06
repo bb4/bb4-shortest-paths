@@ -37,7 +37,10 @@ class SolveBar(onSolve: SolveRequest => Unit, onCompare: Option[AlgorithmKind] =
   pauseButton.addActionListener(_ => playback.pause())
   stepButton.addActionListener(_ => playback.step())
   skipButton.addActionListener(_ => playback.skip())
-  compareBox.addActionListener(_ => onCompare(this.compareAlgorithm()))
+  compareBox.addActionListener(_ => {
+    compareAlgorithmBox.setEnabled(compareBox.isEnabled && compareBox.isSelected)
+    onCompare(this.compareAlgorithm())
+  })
   showOther.setEnabled(false)
   showOther.addActionListener(_ => showOtherAction())
 
@@ -123,6 +126,13 @@ class SolveBar(onSolve: SolveRequest => Unit, onCompare: Option[AlgorithmKind] =
     compareAlgorithmBox.setEnabled(enabled && compareBox.isSelected)
   }
 
+  private[pathviewer] def compareAlgorithmBoxEnabled: Boolean = compareAlgorithmBox.isEnabled
+
+  private[pathviewer] def clickCompareBox(): Unit = compareBox.doClick()
+
+  private[pathviewer] def selectCompareAlgorithm(kind: AlgorithmKind): Unit =
+    compareAlgorithmBox.setSelectedItem(kind)
+
   def setShowOtherEnabled(enabled: Boolean): Unit = showOther.setEnabled(enabled)
 
   def onShowOther(action: () => Unit): Unit = showOtherAction = action
@@ -130,6 +140,7 @@ class SolveBar(onSolve: SolveRequest => Unit, onCompare: Option[AlgorithmKind] =
   private[pathviewer] def selectCompare(kind: Option[AlgorithmKind]): Unit = {
     kind.foreach(compareAlgorithmBox.setSelectedItem)
     compareBox.setSelected(kind.isDefined)
+    compareAlgorithmBox.setEnabled(compareBox.isEnabled && compareBox.isSelected)
   }
   private[pathviewer] def statusText: String = status.getText
   private[pathviewer] def showOtherEnabled: Boolean = showOther.isEnabled

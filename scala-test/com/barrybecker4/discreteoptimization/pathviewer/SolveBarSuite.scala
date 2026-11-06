@@ -22,4 +22,33 @@ class SolveBarSuite extends AnyFunSuite {
     assert(bar.compareAlgorithm().isEmpty)
     assert(!bar.compareBoxEnabled)
   }
+
+  test("Compare checkbox enables second-algorithm combo; compareAlgorithm follows combo") {
+    val bar = new SolveBar(_ => (), _ => ())
+    bar.setCompareEnabled(true)
+    assert(bar.compareBoxEnabled)
+    assert(!bar.compareAlgorithmBoxEnabled)
+
+    bar.clickCompareBox()
+    assert(bar.compareAlgorithmBoxEnabled)
+    assert(bar.compareAlgorithm().contains(Dijkstra))
+
+    bar.selectCompareAlgorithm(ModifiedDijkstra)
+    assert(bar.compareAlgorithm().contains(ModifiedDijkstra))
+
+    bar.clickCompareBox()
+    assert(!bar.compareAlgorithmBoxEnabled)
+    assert(bar.compareAlgorithm().isEmpty)
+  }
+
+  test("setCompareEnabled(false) disables Compare and the second-algorithm combo") {
+    val bar = new SolveBar(_ => (), _ => ())
+    bar.setCompareEnabled(true)
+    bar.clickCompareBox()
+    assert(bar.compareAlgorithmBoxEnabled)
+
+    bar.setCompareEnabled(false)
+    assert(!bar.compareBoxEnabled)
+    assert(!bar.compareAlgorithmBoxEnabled)
+  }
 }
