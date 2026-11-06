@@ -54,7 +54,7 @@ class ModifiedDijkstrasAlgorithm(graph: DirectedGraph) {
 
   def findShortestPaths(source: Int): ShortestPaths = {
     val isOppositeDirection = false
-    determineShortestPaths(source, -1, isOppositeDirection)
+    determineShortestPaths(source, -1, isOppositeDirection, SearchObserver.None)
     
     val shortestPaths = ShortestPaths(graph.numVertices, source)
     
