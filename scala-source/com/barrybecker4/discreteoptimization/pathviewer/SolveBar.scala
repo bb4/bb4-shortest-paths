@@ -50,6 +50,20 @@ class SolveBar(onSolve: SolveRequest => Unit, onCompare: Option[AlgorithmKind] =
 
   def setBusy(busy: Boolean): Unit = solveButton.setEnabled(!busy)
 
+  private[pathviewer] def selectAlgorithm(kind: AlgorithmKind): Unit = algorithm.setSelectedItem(kind)
+
+  private[pathviewer] def kSpec: (Int, Int, Int, Boolean) = {
+    val m = k.getModel.asInstanceOf[SpinnerNumberModel]
+    (
+      m.getNumber.intValue(),
+      m.getMinimum.asInstanceOf[Number].intValue(),
+      m.getMaximum.asInstanceOf[Number].intValue(),
+      k.isEnabled
+    )
+  }
+
+  private[pathviewer] def compareBoxEnabled: Boolean = compareBox.isEnabled
+
   def selectedRequest(): SolveRequest =
     SolveRequest(
       algorithm.getSelectedItem.asInstanceOf[AlgorithmKind],

@@ -40,6 +40,8 @@ class PathViewerFrame extends GraphViewerFrame() {
 
   private[pathviewer] def loadedGraph: Option[DirectedGraph] = loaded
 
+  private[pathviewer] def currentGraphIs(digraph: DirectedGraph): Boolean = loaded.contains(digraph)
+
   override protected def setGraph(graph: Graph, title: String): Unit = {
     stopActiveRenderer()
     super.setGraph(graph, title)
@@ -150,12 +152,11 @@ class PathViewerFrame extends GraphViewerFrame() {
         val worker = new SwingWorker[SolveResult, java.lang.Void] {
           override def doInBackground(): SolveResult = LiveSolver.solve(digraph, valid)
           override def done(): Unit = {
-            val graphAtSolveStart = digraph
             val discardMsg = "Solve discarded because the graph changed"
             try {
               val result = get()
-              if (!loaded.contains(graphAtSolveStart)) solveBar.setStatus(discardMsg)
-              else showSolved(graphAtSolveStart, valid, result)
+              if (!currentGraphIs(digraph)) solveBar.setStatus(discardMsg)
+              else showSolved(digraph, valid, result)
             } catch {
               case _: CancellationException => ()
               case _: InterruptedException =>

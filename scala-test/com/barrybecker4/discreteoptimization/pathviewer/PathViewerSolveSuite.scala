@@ -37,9 +37,57 @@ class PathViewerSolveSuite extends AnyFunSuite {
     }
   }
 
+  test("solveNow ModifiedDijkstra with source 2 marks node 2 as source") {
+    val frame = new Harness
+    frame.setVisible(false)
+    try {
+      frame.load(triangle)
+      frame.run(SolveRequest(AlgorithmKind.ModifiedDijkstra, 2, 0, 3))
+      val graph = frame.viewer.getGraphicGraph
+      assert(graph.getNode("2").getAttribute("ui.class", classOf[String]) == "source")
+    } finally {
+      frame.dispose()
+    }
+  }
+
+  test("solveNow Yen source 0 target 2 k 2 leaves node 0 as source") {
+    val frame = new Harness
+    frame.setVisible(false)
+    try {
+      frame.load(triangle)
+      frame.run(SolveRequest(AlgorithmKind.Yen, 0, 2, 2))
+      val graph = frame.viewer.getGraphicGraph
+      val cls = graph.getNode("0").getAttribute("ui.class", classOf[String])
+      assert(cls != null && cls.contains("source"))
+    } finally {
+      frame.dispose()
+    }
+  }
+
+  test("presenting a second graph updates currentGraphIs") {
+    val second = DirectedGraph(
+      2,
+      IndexedSeq(DirectedEdge(0, 1, 1.0))
+    )
+    val frame = new Harness
+    frame.setVisible(false)
+    try {
+      frame.load(triangle)
+      assert(frame.currentGraphIs(triangle))
+      frame.presentGraph(second, "second", 0)
+      assert(!frame.currentGraphIs(triangle))
+      assert(frame.currentGraphIs(second))
+    } finally {
+      Thread.sleep(300)
+      frame.dispose()
+    }
+  }
+
   /** Subclass so the test can call protected `presentDigraph`. */
   private class Harness extends PathViewerFrame {
     def load(digraph: DirectedGraph): Unit = presentDigraph(digraph, "triangle", 0)
+    def presentGraph(digraph: DirectedGraph, title: String, source: Int): Unit =
+      presentDigraph(digraph, title, source)
     def run(request: SolveRequest): Unit = solveNow(request)
     def graphLoaded: Option[DirectedGraph] = loadedGraph
   }
@@ -55,4 +103,5 @@ class PathViewerSolveSuite extends AnyFunSuite {
     }
     found
   }
+
 }
