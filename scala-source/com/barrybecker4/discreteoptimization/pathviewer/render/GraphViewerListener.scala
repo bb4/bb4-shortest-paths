@@ -24,16 +24,27 @@ case class GraphViewerListener(viewerPipe: ViewerPipe, graph: MultiGraph, pathRe
     val edge = graph.getEdge(id)
     if (edge != null) {
       pathRenderer.colorPaths(edge.getNode0.getId.toInt, edge.getNode1.getId.toInt, HIGHLIGHTED)
+      val left = pathRenderer.ranksText(edge.getNode0.getId.toInt)
+      val right = pathRenderer.ranksText(edge.getNode1.getId.toInt)
+      val ranks = (left.toList ++ right.toList).distinct.mkString(", ")
+      val detail = if (ranks.isEmpty) "" else s"  ranks $ranks"
+      pathRenderer.statusListener(s"edge ${edge.getId}$detail")
+    } else {
+      pathRenderer.colorPaths(id.toInt, HIGHLIGHTED)
+      val nodeIdx = id.toInt
+      val distance = pathRenderer.distanceText(nodeIdx).map(text => s"dist $text")
+      val ranks = pathRenderer.ranksText(nodeIdx).map(text => s"ranks $text")
+      val detail = (distance.toList ++ ranks.toList).mkString("  ")
+      val message = if (detail.isEmpty) s"node $nodeIdx" else s"node $nodeIdx  $detail"
+      pathRenderer.statusListener(message)
     }
-    else pathRenderer.colorPaths(id.toInt, HIGHLIGHTED)
   }
 
   override def mouseLeft(id: String): Unit = {
     val edge = graph.getEdge(id)
     val uiClass = if (isLarge) LARGE else PLAIN
-    if (edge != null) {
-      pathRenderer.colorPaths(edge.getNode0.getId.toInt, edge.getNode1.getId.toInt, uiClass)
-    }
+    if (edge != null) pathRenderer.colorPaths(edge.getNode0.getId.toInt, edge.getNode1.getId.toInt, uiClass)
     else pathRenderer.colorPaths(id.toInt, uiClass)
+    pathRenderer.statusListener("")
   }
 }

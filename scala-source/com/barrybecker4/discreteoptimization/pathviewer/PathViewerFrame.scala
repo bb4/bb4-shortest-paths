@@ -6,7 +6,7 @@ import com.barrybecker4.discreteoptimization.kshortestpaths.KShortestPathsTstUti
 import com.barrybecker4.discreteoptimization.kshortestpaths.model.KShortestPathsSolution
 import com.barrybecker4.discreteoptimization.kshortestpaths.solver.YensKPathsSolver
 import com.barrybecker4.discreteoptimization.pathviewer.PathViewerFrame.{K_SHORTEST_PATHS_PREFIX, SHORTEST_PATHS_PREFIX}
-import com.barrybecker4.discreteoptimization.pathviewer.render.{AnimatedShortestPathRenderer, KShortestPathRenderer, PathRenderer, PlaybackControl, ShortestPathRenderer}
+import com.barrybecker4.discreteoptimization.pathviewer.render.{AnimatedShortestPathRenderer, KShortestPathRenderer, PathColors, PathRenderer, PlaybackControl, ShortestPathRenderer}
 import com.barrybecker4.discreteoptimization.shortestpaths.ShortestPathsTstUtil
 import com.barrybecker4.discreteoptimization.shortestpaths.model.ShortestPathsSolution
 import com.barrybecker4.discreteoptimization.shortestpaths.solver.{DijkstrasPathSolver, ModifiedDijkstrasPathSolver}
@@ -197,13 +197,16 @@ class PathViewerFrame extends GraphViewerFrame() {
     setGraph(stream, titleFor(request))
     result match {
       case SolveResult.ToAll(solution, trace) =>
+        solveBar.setLegend(Seq.empty)
         showShortestPaths(solution, stream, trace)
         solveBar.setStatus(dijkstraStatus(request, solution))
       case SolveResult.OnePath(path, trace) =>
+        solveBar.setLegend(Seq.empty)
         val solution = ShortestPathsSolution(path.weight, List(path))
         showShortestPaths(solution, stream, trace)
         solveBar.setStatus(onePathStatus(request, path))
       case SolveResult.KPaths(solution) =>
+        solveBar.setLegend(solution.shortestPaths.indices.map(index => (index + 1, PathColors.getColor(index))))
         showKShortestPaths(solution, stream)
         solveBar.setStatus(f"Yen k=${solution.k} total ${solution.totalCost}%.4g")
     }
@@ -256,6 +259,7 @@ class PathViewerFrame extends GraphViewerFrame() {
   private[pathviewer] def setAnimate(on: Boolean): Unit = solveBar.setAnimateDefault(on)
 
   private def activate(renderer: PathRenderer): Unit = {
+    renderer.statusListener = text => solveBar.setStatus(text)
     activeRenderer = Some(renderer)
     renderer.render()
   }

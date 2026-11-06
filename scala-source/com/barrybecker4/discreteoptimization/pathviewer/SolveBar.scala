@@ -22,6 +22,7 @@ class SolveBar(onSolve: SolveRequest => Unit, onCompare: Option[AlgorithmKind] =
   private val compareBox = new JCheckBox("Compare")
   private val compareAlgorithmBox = new JComboBox[AlgorithmKind](Array(Dijkstra, ModifiedDijkstra, Yen))
   private val status = new JLabel("Open a graph, then Solve")
+  private val legend = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 4, 0))
   private var playback: PlaybackControl = new PlaybackControl
 
   compareBox.setEnabled(false)
@@ -63,6 +64,19 @@ class SolveBar(onSolve: SolveRequest => Unit, onCompare: Option[AlgorithmKind] =
   def setSource(vertex: Int): Unit = source.setValue(vertex)
 
   def setStatus(text: String): Unit = status.setText(text)
+
+  def setLegend(entries: Seq[(Int, java.awt.Color)]): Unit = {
+    legend.removeAll()
+    entries.foreach { (rank, color) =>
+      val swatch = new JLabel(rank.toString)
+      swatch.setOpaque(true)
+      swatch.setBackground(color)
+      legend.add(swatch)
+    }
+    if (legend.getParent == null) add(legend)
+    revalidate()
+    repaint()
+  }
 
   def setBusy(busy: Boolean): Unit = solveButton.setEnabled(!busy)
 

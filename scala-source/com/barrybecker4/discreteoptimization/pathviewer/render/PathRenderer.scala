@@ -36,6 +36,8 @@ trait PathRenderer(graph: MultiGraph, viewer: Viewer) {
 
   protected val viewerPipe: ViewerPipe = GraphViewerPipe("my_custom_pipe", viewer.newViewerPipe())
 
+  var statusListener: String => Unit = _ => ()
+
   private val acceptingEvents = new AtomicBoolean(true)
   private var pumpThread: Option[Thread] = None
 
@@ -122,4 +124,7 @@ trait PathRenderer(graph: MultiGraph, viewer: Viewer) {
   /** color paths containing both nodeIdx1 and nodeIdx2 */
   def colorPaths(nodeIdx1: Int, nodeIdx: Int, uiClass: UiClass): Unit
 
+  def distanceText(nodeIdx: Int): Option[String] = None
+
+  def ranksText(nodeIdx: Int): Option[String] = None
 }

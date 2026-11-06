@@ -17,10 +17,20 @@ object KShortestPathRenderer {
   /** Paths at `indices`, which need not be contiguous. */
   def pathsAt(paths: Seq[Path], indices: Seq[Int]): Seq[(Path, Int)] =
     indices.map(index => (paths(index), index))
+
+  def ranksText(solution: KShortestPathsSolution, nodeIdx: Int): Option[String] = {
+    val ranks = solution.shortestPaths.zipWithIndex.collect {
+      case (path, index) if path.containsNode(nodeIdx) => (index + 1).toString
+    }
+    if (ranks.isEmpty) None else Some(ranks.mkString(", "))
+  }
 }
 
 case class KShortestPathRenderer(graph: MultiGraph, solution: KShortestPathsSolution, viewer: GraphViewer)
   extends PathRenderer(graph, viewer) {
+
+  override def ranksText(nodeIdx: Int): Option[String] =
+    KShortestPathRenderer.ranksText(solution, nodeIdx)
 
   override protected def initialAnimation(): Unit = {
     var ct = 0

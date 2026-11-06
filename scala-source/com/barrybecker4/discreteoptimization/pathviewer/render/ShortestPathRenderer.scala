@@ -8,8 +8,30 @@ import org.graphstream.graph.implementations.MultiGraph
 import org.graphstream.ui.view.Viewer
 
 
+object ShortestPathRenderer {
+  def distanceText(solution: ShortestPathsSolution, nodeIdx: Int): Option[String] = {
+    val ending = solution.paths.filter(path => path.nodes.nonEmpty && path.lastNode == nodeIdx)
+    if (ending.nonEmpty) {
+      val finite = ending.filterNot(_.weight.isPosInfinity)
+      if (finite.isEmpty) Some("unreachable")
+      else {
+        val formatted = f"${finite.minBy(_.weight).weight}%.4g"
+        Some(formatted.replaceFirst("""(\.\d*?[1-9])0+(e.*)?$""", "$1$2")
+          .replaceFirst("""\.0+(e.*)?$""", "$1"))
+      }
+    } else {
+      solution.paths.lift(nodeIdx)
+        .filter(path => path.nodes.isEmpty || path.weight.isPosInfinity)
+        .map(_ => "unreachable")
+    }
+  }
+}
+
 case class ShortestPathRenderer(graph: MultiGraph, solution: ShortestPathsSolution, viewer: Viewer)
   extends PathRenderer(graph, viewer) {
+
+  override def distanceText(nodeIdx: Int): Option[String] =
+    ShortestPathRenderer.distanceText(solution, nodeIdx)
 
   override def colorPaths(nodeIdx: Int, uiClass: UiClass): Unit = {
     val path = getPath(nodeIdx)
