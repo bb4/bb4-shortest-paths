@@ -46,9 +46,17 @@ class GraphViewerFrame extends JFrame("Graph Viewer") {
     openItem
   }
 
+  override def dispose(): Unit = {
+    if (viewer != null) viewer.close()
+    super.dispose()
+  }
+
   protected def setGraph(graph: Graph, title: String): Unit = {
-    if (viewer != null)
-      remove(viewer.getViewPanel)
+    if (viewer != null) {
+      val view = viewer.getDefaultView
+      if (view != null) remove(view.asInstanceOf[java.awt.Component])
+      viewer.close()
+    }
     viewer = new GraphViewer(graph)
     this.setTitle(title)
 

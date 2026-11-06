@@ -14,8 +14,11 @@ import javax.swing.{JFrame, JLabel, WindowConstants}
  */
 class GraphViewer(thisGraph: Graph) extends SwingViewer(thisGraph, Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD) {
 
-  def getViewPanel: ViewPanel =
-    addDefaultView(false).asInstanceOf[ViewPanel]
+  def getViewPanel: ViewPanel = {
+    val existing = getDefaultView
+    if (existing != null) existing.asInstanceOf[ViewPanel]
+    else addDefaultView(false).asInstanceOf[ViewPanel]
+  }
 
 
   override def addDefaultView(openInAFrame: Boolean): View = views.synchronized {

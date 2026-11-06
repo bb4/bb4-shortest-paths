@@ -9,6 +9,7 @@ import org.graphstream.ui.view.util.InteractiveElement
 import org.graphstream.ui.view.{Viewer, ViewerPipe}
 
 import java.util
+import java.util.concurrent.atomic.AtomicBoolean
 
 
 object PathRenderer {
@@ -35,21 +36,45 @@ trait PathRenderer(graph: MultiGraph, viewer: Viewer) {
 
   protected val viewerPipe: ViewerPipe = GraphViewerPipe("my_custom_pipe", viewer.newViewerPipe())
 
+  private val acceptingEvents = new AtomicBoolean(true)
+  private var pumpThread: Option[Thread] = None
+
   def render(): Unit = {
     val viewerListener = GraphViewerListener(viewerPipe, graph, this)
     viewerPipe.addViewerListener(viewerListener)
 
     // simulation and interaction happens in a separate thread
-    new Thread(() => {
-      initialAnimation()
-      listenForMouseEvents()
-    }).start()
+    val thread = new Thread(() => pumpEvents(), "path-renderer-pump")
+    pumpThread = Some(thread)
+    thread.start()
+  }
+
+  /**
+   * End the pump. Safe from the pump thread (viewClosed) and from the UI thread.
+   * Interrupts a pump blocked in `blockingPump` or in the opening animation,
+   * since a flag alone is not observed until the next event.
+   */
+  def stop(): Unit = {
+    acceptingEvents.set(false)
+    pumpThread.foreach { thread =>
+      if (thread != Thread.currentThread()) thread.interrupt()
+    }
   }
 
   protected def initialAnimation(): Unit = {}
 
+  private def pumpEvents(): Unit = {
+    try {
+      if (acceptingEvents.get()) initialAnimation()
+      listenForMouseEvents()
+    } catch {
+      case _: InterruptedException =>
+        acceptingEvents.set(false)
+    }
+  }
+
   private def listenForMouseEvents(): Unit = {
-    while (true) {
+    while (acceptingEvents.get()) {
       // use blockingPump to avoid 100% CPU usage
       viewerPipe.blockingPump()
     }

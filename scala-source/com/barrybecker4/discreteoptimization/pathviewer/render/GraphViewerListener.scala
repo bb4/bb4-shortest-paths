@@ -12,7 +12,7 @@ case class GraphViewerListener(viewerPipe: ViewerPipe, graph: MultiGraph, pathRe
   private val isLarge: Boolean = graph.edges().count() > LARGE_GRAPH_THRESH
 
   override def viewClosed(viewName: String): Unit =
-    println("closed "+ viewName)
+    pathRenderer.stop()
 
   override def buttonPushed(id: String): Unit =
     println("button" + id + " pushed")

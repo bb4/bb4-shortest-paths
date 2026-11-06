@@ -6,11 +6,13 @@ import com.barrybecker4.discreteoptimization.kshortestpaths.KShortestPathsTstUti
 import com.barrybecker4.discreteoptimization.kshortestpaths.model.KShortestPathsSolution
 import com.barrybecker4.discreteoptimization.kshortestpaths.solver.YensKPathsSolver
 import com.barrybecker4.discreteoptimization.pathviewer.PathViewerFrame.{K_SHORTEST_PATHS_PREFIX, SHORTEST_PATHS_PREFIX}
+import com.barrybecker4.discreteoptimization.pathviewer.render.PathRenderer
 import com.barrybecker4.discreteoptimization.pathviewer.render.ShortestPathRenderer
 import com.barrybecker4.discreteoptimization.pathviewer.render.KShortestPathRenderer
 import com.barrybecker4.discreteoptimization.shortestpaths.ShortestPathsTstUtil
 import com.barrybecker4.discreteoptimization.shortestpaths.model.ShortestPathsSolution
 import com.barrybecker4.discreteoptimization.shortestpaths.solver.{DijkstrasPathSolver, ModifiedDijkstrasPathSolver}
+import org.graphstream.graph.Graph
 import org.graphstream.graph.implementations.MultiGraph
 
 import java.io.File
@@ -26,6 +28,23 @@ object PathViewerFrame {
 }
 
 class PathViewerFrame extends GraphViewerFrame() {
+
+  private var activeRenderer: Option[PathRenderer] = None
+
+  override protected def setGraph(graph: Graph, title: String): Unit = {
+    stopActiveRenderer()
+    super.setGraph(graph, title)
+  }
+
+  override def dispose(): Unit = {
+    stopActiveRenderer()
+    super.dispose()
+  }
+
+  private def stopActiveRenderer(): Unit = {
+    activeRenderer.foreach(_.stop())
+    activeRenderer = None
+  }
 
   override protected def createMenu(): Unit = {
     val myMenuBar: JMenuBar = new JMenuBar()
@@ -99,14 +118,15 @@ class PathViewerFrame extends GraphViewerFrame() {
   private def sourceVertex(solution: KShortestPathsSolution): Int =
     solution.shortestPaths.view.flatMap(_.nodes.headOption).headOption.getOrElse(0)
 
-  private def showShortestPaths(solution: ShortestPathsSolution, graph: MultiGraph): Unit = {
+  protected def showShortestPaths(solution: ShortestPathsSolution, graph: MultiGraph): Unit =
+    activate(ShortestPathRenderer(graph, solution, viewer))
 
-    ShortestPathRenderer(graph, solution, viewer).render()
-  }
+  protected def showKShortestPaths(solution: KShortestPathsSolution, graph: MultiGraph): Unit =
+    activate(KShortestPathRenderer(graph, solution, viewer))
 
-  private def showKShortestPaths(solution: KShortestPathsSolution, graph: MultiGraph): Unit = {
-
-    KShortestPathRenderer(graph, solution, viewer).render()
+  private def activate(renderer: PathRenderer): Unit = {
+    activeRenderer = Some(renderer)
+    renderer.render()
   }
 
   private def getGraphName(fileName: String): String = {
