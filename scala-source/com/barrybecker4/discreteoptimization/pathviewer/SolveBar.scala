@@ -21,6 +21,8 @@ class SolveBar(onSolve: SolveRequest => Unit, onCompare: Option[AlgorithmKind] =
   private val skipButton = new JButton("Skip")
   private val compareBox = new JCheckBox("Compare")
   private val compareAlgorithmBox = new JComboBox[AlgorithmKind](Array(Dijkstra, ModifiedDijkstra, Yen))
+  private val showOther = new JButton("Show other")
+  private var showOtherAction: () => Unit = () => ()
   private val status = new JLabel("Open a graph, then Solve")
   private val legend = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 4, 0))
   private var playback: PlaybackControl = new PlaybackControl
@@ -36,6 +38,8 @@ class SolveBar(onSolve: SolveRequest => Unit, onCompare: Option[AlgorithmKind] =
   stepButton.addActionListener(_ => playback.step())
   skipButton.addActionListener(_ => playback.skip())
   compareBox.addActionListener(_ => onCompare(this.compareAlgorithm()))
+  showOther.setEnabled(false)
+  showOther.addActionListener(_ => showOtherAction())
 
   add(new JLabel("Algorithm"))
   add(algorithm)
@@ -53,6 +57,7 @@ class SolveBar(onSolve: SolveRequest => Unit, onCompare: Option[AlgorithmKind] =
   add(skipButton)
   add(compareBox)
   add(compareAlgorithmBox)
+  add(showOther)
   add(status)
 
   def setVertexRange(maxId: Int): Unit = {
@@ -112,9 +117,21 @@ class SolveBar(onSolve: SolveRequest => Unit, onCompare: Option[AlgorithmKind] =
     if (compareBox.isSelected) Some(compareAlgorithmBox.getSelectedItem.asInstanceOf[AlgorithmKind])
     else None
 
-  /** Task 6 calls this. Until then the checkbox stays disabled. */
+  /** The frame enables Compare once a graph is loaded. */
   def setCompareEnabled(enabled: Boolean): Unit = {
     compareBox.setEnabled(enabled)
     compareAlgorithmBox.setEnabled(enabled && compareBox.isSelected)
   }
+
+  def setShowOtherEnabled(enabled: Boolean): Unit = showOther.setEnabled(enabled)
+
+  def onShowOther(action: () => Unit): Unit = showOtherAction = action
+
+  private[pathviewer] def selectCompare(kind: Option[AlgorithmKind]): Unit = {
+    kind.foreach(compareAlgorithmBox.setSelectedItem)
+    compareBox.setSelected(kind.isDefined)
+  }
+  private[pathviewer] def statusText: String = status.getText
+  private[pathviewer] def showOtherEnabled: Boolean = showOther.isEnabled
+  private[pathviewer] def clickShowOther(): Unit = showOther.doClick()
 }

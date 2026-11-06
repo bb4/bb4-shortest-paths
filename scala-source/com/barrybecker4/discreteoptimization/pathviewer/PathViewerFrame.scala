@@ -36,6 +36,18 @@ class PathViewerFrame extends GraphViewerFrame() {
   private val solveBar = new SolveBar(solve, _ => ())
   @volatile private var lastSummary = "Open a graph, then Solve"
   getContentPane.add(solveBar, BorderLayout.NORTH)
+  solveBar.onShowOther(() => toggleShown())
+
+  private case class Prepared(
+      digraph: DirectedGraph,
+      request: SolveRequest,
+      result: SolveResult,
+      other: Option[(SolveRequest, SolveResult)],
+      summary: String
+  )
+
+  private var shown: Option[Prepared] = None
+  private var showingSecond = false
 
   private[pathviewer] def loadedGraph: Option[DirectedGraph] = loaded
 
@@ -119,6 +131,8 @@ class PathViewerFrame extends GraphViewerFrame() {
     val graphName = getGraphName(file.getName)
     val digraph = loadGraphFromName(graphName)
     loaded = Some(digraph)
+    clearShown()
+    solveBar.setCompareEnabled(true)
     solveBar.setVertexRange(LiveSolver.maxVertexId(digraph))
     solveBar.setSource(sourceVertex)
     solveBar.setAnimateDefault(digraph.edges.size <= GraphStreamAdapter.LARGE_GRAPH_THRESH)
@@ -133,6 +147,8 @@ class PathViewerFrame extends GraphViewerFrame() {
     sourceVertex: Int = 0
   ): Unit = {
     loaded = Some(digraph)
+    clearShown()
+    solveBar.setCompareEnabled(true)
     solveBar.setVertexRange(LiveSolver.maxVertexId(digraph))
     solveBar.setSource(sourceVertex)
     solveBar.setAnimateDefault(digraph.edges.size <= GraphStreamAdapter.LARGE_GRAPH_THRESH)
@@ -151,14 +167,15 @@ class PathViewerFrame extends GraphViewerFrame() {
         setSummary(message)
       case Right(valid) =>
         solveBar.setBusy(true)
-        val worker = new SwingWorker[SolveResult, java.lang.Void] {
-          override def doInBackground(): SolveResult = LiveSolver.solve(digraph, valid)
+        val second = secondRequest(valid) // read Swing state on the EDT, before the worker starts
+        val worker = new SwingWorker[Prepared, java.lang.Void] {
+          override def doInBackground(): Prepared = prepare(digraph, valid, second)
           override def done(): Unit = {
             val discardMsg = "Solve discarded because the graph changed"
             try {
-              val result = get()
+              val prepared = get()
               if (!currentGraphIs(digraph)) setSummary(discardMsg)
-              else showSolved(digraph, valid, result)
+              else publishPrepared(prepared)
             } catch {
               case _: CancellationException => ()
               case _: InterruptedException =>
@@ -180,9 +197,63 @@ class PathViewerFrame extends GraphViewerFrame() {
     val digraph = loaded.getOrElse(throw new IllegalStateException("Open a graph first"))
     val valid = LiveSolver.validate(digraph, request)
       .fold(message => throw new IllegalArgumentException(message), identity)
-    showSolved(digraph, valid, LiveSolver.solve(digraph, valid))
+    publishPrepared(prepare(digraph, valid, secondRequest(valid)))
     waitForSourceInViewer(valid.source)
   }
+
+  private def secondRequest(first: SolveRequest): Option[SolveRequest] =
+    solveBar.compareAlgorithm().map(kind => first.copy(algorithm = kind))
+
+  /** Safe off the EDT: touches no Swing state. `second` is read from the Solve bar on the EDT. */
+  private def prepare(digraph: DirectedGraph, valid: SolveRequest, second: Option[SolveRequest]): Prepared =
+    second match {
+      case Some(other) if other.algorithm != valid.algorithm =>
+        LiveSolver.validate(digraph, other) match {
+          case Left(message) =>
+            Prepared(digraph, valid, LiveSolver.solve(digraph, valid), None, s"Compare skipped: $message")
+          case Right(validOther) =>
+            val compared = LiveSolver.compare(digraph, valid, validOther)
+            val agreement = if (compared.sameTargetCost) "same target cost" else "target costs differ"
+            Prepared(
+              digraph,
+              valid,
+              compared.first,
+              Some((validOther, compared.second)),
+              s"${valid.algorithm} vs ${validOther.algorithm}: $agreement"
+            )
+        }
+      case _ =>
+        Prepared(digraph, valid, LiveSolver.solve(digraph, valid), None, "")
+    }
+
+  private def publishPrepared(prepared: Prepared): Unit = {
+    showingSecond = false
+    shown = prepared.other.map(_ => prepared)
+    solveBar.setShowOtherEnabled(prepared.other.isDefined)
+    showSolved(prepared.digraph, prepared.request, prepared.result)
+    if (prepared.summary.nonEmpty) setSummary(prepared.summary)
+  }
+
+  private def clearShown(): Unit = {
+    shown = None
+    showingSecond = false
+    solveBar.setShowOtherEnabled(false)
+  }
+
+  private[pathviewer] def toggleShown(): Unit =
+    shown.foreach { prepared =>
+      if (!currentGraphIs(prepared.digraph)) clearShown()
+      else {
+        val (request, result) = prepared.other match {
+          case Some((otherRequest, otherResult)) if !showingSecond => (otherRequest, otherResult)
+          case _ => (prepared.request, prepared.result)
+        }
+        showingSecond = prepared.other.isDefined && !showingSecond
+        showSolved(prepared.digraph, request, result)
+      }
+    }
+
+  private[pathviewer] def solveBarForTest: SolveBar = solveBar
 
   private def waitForSourceInViewer(source: Int): Unit = {
     val deadline = System.nanoTime() + 3_000_000_000L

@@ -75,6 +75,32 @@ class LiveSolverSuite extends AnyFunSuite {
       Left("k must be from 1 to 10"))
   }
 
+  test("compare reports the shared target cost for Dijkstra and Modified Dijkstra") {
+    val compared = LiveSolver.compare(
+      triangle,
+      SolveRequest(Dijkstra, 0, 2, 3),
+      SolveRequest(ModifiedDijkstra, 0, 2, 3)
+    )
+    assert(LiveSolver.targetCost(compared.first, 2).contains(3.0))
+    assert(LiveSolver.targetCost(compared.second, 2).contains(3.0))
+    assert(compared.sameTargetCost)
+  }
+
+  test("compare reports different target costs when the second request starts elsewhere") {
+    val compared = LiveSolver.compare(
+      triangle,
+      SolveRequest(Dijkstra, 0, 2, 3),
+      SolveRequest(Dijkstra, 1, 2, 3)
+    )
+    assert(LiveSolver.targetCost(compared.second, 2).contains(2.0))
+    assert(!compared.sameTargetCost)
+  }
+
+  test("Yen target cost is the cheapest path weight") {
+    val result = LiveSolver.solve(triangle, SolveRequest(Yen, 0, 2, 2))
+    assert(LiveSolver.targetCost(result, 2).contains(3.0))
+  }
+
   test("Modified Dijkstra with no path returns the empty path") {
     val graph = DirectedGraph(2, IndexedSeq(DirectedEdge(0, 1, 1.0)))
     val result = LiveSolver.solve(graph, SolveRequest(ModifiedDijkstra, 1, 0, 3))

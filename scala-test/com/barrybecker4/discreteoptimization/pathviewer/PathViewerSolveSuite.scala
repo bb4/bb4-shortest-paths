@@ -85,6 +85,36 @@ class PathViewerSolveSuite extends AnyFunSuite {
     }
   }
 
+  test("Compare enables Show other, reports agreement, and toggling redraws the other result") {
+    val frame = new Harness
+    frame.setVisible(false)
+    try {
+      frame.load(triangle)
+      frame.useAnimation(false)
+      val bar = frame.solveBarForTest
+      assert(!bar.showOtherEnabled)
+
+      frame.run(SolveRequest(AlgorithmKind.Dijkstra, 0, 2, 3))
+      assert(!bar.showOtherEnabled)
+
+      bar.selectCompare(Some(AlgorithmKind.ModifiedDijkstra))
+      frame.run(SolveRequest(AlgorithmKind.Dijkstra, 0, 2, 3))
+      assert(bar.showOtherEnabled)
+      assert(bar.statusText == "Dijkstra vs ModifiedDijkstra: same target cost")
+
+      bar.clickShowOther()
+      assert(bar.statusText.startsWith("Modified 0 → 2"))
+      bar.clickShowOther()
+      assert(bar.statusText.startsWith("Dijkstra path to 2"))
+
+      frame.presentGraph(triangle, "again", 0)
+      assert(!bar.showOtherEnabled)
+    } finally {
+      Thread.sleep(300)
+      frame.dispose()
+    }
+  }
+
   /** Subclass so the test can call protected `presentDigraph`. */
   private class Harness extends PathViewerFrame {
     def load(digraph: DirectedGraph): Unit = presentDigraph(digraph, "triangle", 0)

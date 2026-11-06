@@ -20,6 +20,8 @@ enum SolveResult {
   case KPaths(solution: KShortestPathsSolution)
 }
 
+case class ComparedSolutions(first: SolveResult, second: SolveResult, sameTargetCost: Boolean)
+
 object LiveSolver {
 
   def maxVertexId(graph: DirectedGraph): Int = {
@@ -60,4 +62,29 @@ object LiveSolver {
           .findPaths(graph, request.source, request.target, request.k)
         SolveResult.KPaths(solution)
     }
+
+  /** Finite cost of the path to `target`, if the result has one. */
+  def targetCost(result: SolveResult, target: Int): Option[Double] = result match {
+    case SolveResult.ToAll(solution, _) =>
+      solution.paths
+        .find(path => path.nodes.nonEmpty && path.lastNode == target && !path.weight.isPosInfinity)
+        .map(_.weight)
+    case SolveResult.OnePath(path, _) =>
+      if (path.nodes.nonEmpty && !path.weight.isPosInfinity) Some(path.weight) else None
+    case SolveResult.KPaths(solution) =>
+      solution.shortestPaths.headOption
+        .filter(path => path.nodes.nonEmpty && !path.weight.isPosInfinity)
+        .map(_.weight)
+  }
+
+  /** Caller must pass requests that `validate` accepts. */
+  def compare(graph: DirectedGraph, first: SolveRequest, second: SolveRequest): ComparedSolutions = {
+    val a = solve(graph, first)
+    val b = solve(graph, second)
+    val same = (targetCost(a, first.target), targetCost(b, second.target)) match {
+      case (Some(left), Some(right)) => left == right
+      case _ => false
+    }
+    ComparedSolutions(a, b, same)
+  }
 }
