@@ -103,7 +103,7 @@ class PathViewerSolveSuite extends AnyFunSuite {
       assert(bar.statusText == "Dijkstra vs ModifiedDijkstra: same target cost")
 
       bar.clickShowOther()
-      assert(bar.statusText.startsWith("Modified 0 → 2"))
+      assert(bar.statusText.startsWith("ModifiedDijkstra 0 → 2"))
       bar.clickShowOther()
       assert(bar.statusText.startsWith("Dijkstra path to 2"))
 
@@ -117,7 +117,7 @@ class PathViewerSolveSuite extends AnyFunSuite {
 
   /** Subclass so the test can call protected `presentDigraph`. */
   private class Harness extends PathViewerFrame {
-    def load(digraph: DirectedGraph): Unit = presentDigraph(digraph, "triangle", 0)
+    def load(digraph: DirectedGraph): Unit = presentDigraph(digraph, "triangle")
     def presentGraph(digraph: DirectedGraph, title: String, source: Int): Unit =
       presentDigraph(digraph, title, source)
     def useAnimation(on: Boolean): Unit = setAnimate(on)

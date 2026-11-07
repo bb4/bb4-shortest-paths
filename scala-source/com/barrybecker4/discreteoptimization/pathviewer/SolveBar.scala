@@ -9,7 +9,10 @@ import javax.swing.*
 class SolveBar(onSolve: SolveRequest => Unit, onCompare: Option[AlgorithmKind] => Unit)
   extends JPanel(new FlowLayout(FlowLayout.LEFT)) {
 
-  private val algorithm = new JComboBox[AlgorithmKind](Array(Dijkstra, ModifiedDijkstra, Yen))
+  private val algorithmChoices = Array(
+    Dijkstra, ModifiedDijkstra, BidirectionalDijkstra, AStar, Alt, Yen, Eppstein
+  )
+  private val algorithm = new JComboBox[AlgorithmKind](algorithmChoices)
   private val source = new JSpinner(new SpinnerNumberModel(0, 0, 0, 1))
   private val target = new JSpinner(new SpinnerNumberModel(0, 0, 0, 1))
   private val k = new JSpinner(new SpinnerNumberModel(3, 1, 10, 1))
@@ -20,7 +23,7 @@ class SolveBar(onSolve: SolveRequest => Unit, onCompare: Option[AlgorithmKind] =
   private val stepButton = new JButton("Step")
   private val skipButton = new JButton("Skip")
   private val compareBox = new JCheckBox("Compare")
-  private val compareAlgorithmBox = new JComboBox[AlgorithmKind](Array(Dijkstra, ModifiedDijkstra, Yen))
+  private val compareAlgorithmBox = new JComboBox[AlgorithmKind](algorithmChoices.clone())
   private val showOther = new JButton("Show other")
   private var showOtherAction: () => Unit = () => ()
   private val status = new JLabel("Open a graph, then Solve")
@@ -31,7 +34,9 @@ class SolveBar(onSolve: SolveRequest => Unit, onCompare: Option[AlgorithmKind] =
   compareAlgorithmBox.setEnabled(false)
   k.setEnabled(false)
 
-  algorithm.addActionListener(_ => k.setEnabled(algorithm.getSelectedItem == Yen))
+  algorithm.addActionListener(_ =>
+    k.setEnabled(LiveSolver.usesK(algorithm.getSelectedItem.asInstanceOf[AlgorithmKind]))
+  )
   solveButton.addActionListener(_ => onSolve(selectedRequest()))
   playButton.addActionListener(_ => playback.play())
   pauseButton.addActionListener(_ => playback.pause())

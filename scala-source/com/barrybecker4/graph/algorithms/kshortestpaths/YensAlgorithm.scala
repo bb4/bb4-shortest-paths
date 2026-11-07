@@ -10,7 +10,8 @@ import scala.collection.mutable
 
 
 /**
- * https://en.wikipedia.org/wiki/Yen%27s_algorithm#:~:text=In%20graph%20theory%2C%20Yen's%20algorithm,deviations%20of%20the%20best%20path.
+ * Yen's algorithm for the k shortest loopless (simple) s–t paths.
+ * https://en.wikipedia.org/wiki/Yen%27s_algorithm
  */
 class YensAlgorithm(graph: DirectedGraph) extends KShortestPathsFinder {
 

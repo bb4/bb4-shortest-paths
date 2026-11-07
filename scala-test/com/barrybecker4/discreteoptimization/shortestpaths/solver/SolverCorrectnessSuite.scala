@@ -1,7 +1,7 @@
 package com.barrybecker4.discreteoptimization.shortestpaths.solver
 
 import com.barrybecker4.discreteoptimization.benchmark.PathCosts
-import com.barrybecker4.discreteoptimization.kshortestpaths.solver.YensKPathsSolver
+import com.barrybecker4.discreteoptimization.kshortestpaths.solver.{EppsteinsKPathsSolver, YensKPathsSolver}
 import com.barrybecker4.graph.GraphTstUtil
 import com.barrybecker4.graph.Path
 import com.barrybecker4.graph.directed.{DirectedEdge, DirectedGraph}
@@ -80,6 +80,39 @@ class SolverCorrectnessSuite extends AnyFunSuite {
   test("Yen's solver returns fewer paths than k when not enough loopless paths exist") {
     val line = DirectedGraph(2, IndexedSeq(DirectedEdge(0, 1, 1.0)))
     val solution = YensKPathsSolver().findPaths(line, 0, 1, 5)
+    assert(solution.shortestPaths.size == 1)
+    assert(solution.shortestPaths.head == Path(1.0, List(0, 1)))
+    assert(solution.k == 5)
+  }
+
+  test("Eppstein's first path cost matches Dijkstra for the same source and destination") {
+    val graph = GraphTstUtil.getGraph("sp_10_1")
+    val destination = 5
+    val eppstein = EppsteinsKPathsSolver().findPaths(graph, 0, destination, 3)
+    val dijkstra = DijkstrasPathSolver().findPaths(graph)
+    assert(eppstein.shortestPaths.nonEmpty)
+    assert(PathCosts.sameCost(eppstein.shortestPaths.head.weight, dijkstra.paths(destination).weight))
+  }
+
+  test("Eppstein's first path from a non-zero source matches Dijkstra") {
+    val destination = 3
+    val eppstein = EppsteinsKPathsSolver().findPaths(chain, 2, destination, 2)
+    val dijkstra = DijkstrasPathSolver().findPaths(chain, 2)
+    assert(eppstein.shortestPaths.size == 1)
+    assert(PathCosts.sameCost(eppstein.shortestPaths.head.weight, dijkstra.paths(destination).weight))
+    assert(eppstein.shortestPaths.head.weight == 1.0)
+  }
+
+  test("Eppstein's solver with k = 1 returns only the shortest path") {
+    val solution = EppsteinsKPathsSolver().findPaths(chain, 2, 3, 1)
+    assert(solution.shortestPaths.size == 1)
+    assert(solution.shortestPaths.head == Path(1.0, List(2, 3)))
+    assert(solution.k == 1)
+  }
+
+  test("Eppstein's solver returns fewer paths than k when not enough walks exist") {
+    val line = DirectedGraph(2, IndexedSeq(DirectedEdge(0, 1, 1.0)))
+    val solution = EppsteinsKPathsSolver().findPaths(line, 0, 1, 5)
     assert(solution.shortestPaths.size == 1)
     assert(solution.shortestPaths.head == Path(1.0, List(0, 1)))
     assert(solution.k == 5)

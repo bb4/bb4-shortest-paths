@@ -4,13 +4,14 @@ import com.barrybecker4.graph.directed.DirectedGraphParser
 import com.barrybecker4.graph.visualization.{GraphStreamAdapter, GraphViewerFrame}
 import com.barrybecker4.discreteoptimization.kshortestpaths.KShortestPathsTstUtil
 import com.barrybecker4.discreteoptimization.kshortestpaths.model.KShortestPathsSolution
-import com.barrybecker4.discreteoptimization.kshortestpaths.solver.YensKPathsSolver
+import com.barrybecker4.discreteoptimization.kshortestpaths.solver.{EppsteinsKPathsSolver, YensKPathsSolver}
 import com.barrybecker4.discreteoptimization.pathviewer.PathViewerFrame.{K_SHORTEST_PATHS_PREFIX, SHORTEST_PATHS_PREFIX}
 import com.barrybecker4.discreteoptimization.pathviewer.render.{AnimatedShortestPathRenderer, KShortestPathRenderer, PathColors, PathRenderer, PlaybackControl, ShortestPathRenderer}
 import com.barrybecker4.discreteoptimization.shortestpaths.ShortestPathsTstUtil
 import com.barrybecker4.discreteoptimization.shortestpaths.model.ShortestPathsSolution
 import com.barrybecker4.discreteoptimization.shortestpaths.solver.{DijkstrasPathSolver, ModifiedDijkstrasPathSolver}
 import com.barrybecker4.graph.Path
+import com.barrybecker4.graph.algorithms.shortestpaths.AltAlgorithm
 import com.barrybecker4.graph.directed.DirectedGraph
 import org.graphstream.graph.Graph
 import org.graphstream.graph.implementations.MultiGraph
@@ -33,6 +34,7 @@ class PathViewerFrame extends GraphViewerFrame() {
 
   private var activeRenderer: Option[PathRenderer] = None
   private var loaded: Option[DirectedGraph] = None
+  private var cachedAlt: Option[(DirectedGraph, AltAlgorithm)] = None
   private val solveBar = new SolveBar(solve, _ => ())
   @volatile private var lastSummary = "Open a graph, then Solve"
   getContentPane.add(solveBar, BorderLayout.NORTH)
@@ -48,6 +50,18 @@ class PathViewerFrame extends GraphViewerFrame() {
 
   private var shown: Option[Prepared] = None
   private var showingSecond = false
+
+  private def altFor(graph: DirectedGraph): AltAlgorithm =
+    cachedAlt match {
+      case Some((g, alg)) if g eq graph => alg
+      case _ =>
+        val alg = new AltAlgorithm(graph)
+        cachedAlt = Some((graph, alg))
+        alg
+    }
+
+  private def clearAltCache(): Unit =
+    cachedAlt = None
 
   private[pathviewer] def loadedGraph: Option[DirectedGraph] = loaded
 
@@ -131,6 +145,7 @@ class PathViewerFrame extends GraphViewerFrame() {
     val graphName = getGraphName(file.getName)
     val digraph = loadGraphFromName(graphName)
     loaded = Some(digraph)
+    clearAltCache()
     clearShown()
     solveBar.setCompareEnabled(true)
     solveBar.setVertexRange(LiveSolver.maxVertexId(digraph))
@@ -147,6 +162,7 @@ class PathViewerFrame extends GraphViewerFrame() {
     sourceVertex: Int = 0
   ): Unit = {
     loaded = Some(digraph)
+    clearAltCache()
     clearShown()
     solveBar.setCompareEnabled(true)
     solveBar.setVertexRange(LiveSolver.maxVertexId(digraph))
@@ -205,14 +221,15 @@ class PathViewerFrame extends GraphViewerFrame() {
     solveBar.compareAlgorithm().map(kind => first.copy(algorithm = kind))
 
   /** Safe off the EDT: touches no Swing state. `second` is read from the Solve bar on the EDT. */
-  private def prepare(digraph: DirectedGraph, valid: SolveRequest, second: Option[SolveRequest]): Prepared =
+  private def prepare(digraph: DirectedGraph, valid: SolveRequest, second: Option[SolveRequest]): Prepared = {
+    val alt = (g: DirectedGraph) => altFor(g)
     second match {
       case Some(other) if other.algorithm != valid.algorithm =>
         LiveSolver.validate(digraph, other) match {
           case Left(message) =>
-            Prepared(digraph, valid, LiveSolver.solve(digraph, valid), None, s"Compare skipped: $message")
+            Prepared(digraph, valid, LiveSolver.solve(digraph, valid, alt), None, s"Compare skipped: $message")
           case Right(validOther) =>
-            val compared = LiveSolver.compare(digraph, valid, validOther)
+            val compared = LiveSolver.compare(digraph, valid, validOther, alt)
             val agreement = if (compared.sameTargetCost) "same target cost" else "target costs differ"
             Prepared(
               digraph,
@@ -223,8 +240,9 @@ class PathViewerFrame extends GraphViewerFrame() {
             )
         }
       case _ =>
-        Prepared(digraph, valid, LiveSolver.solve(digraph, valid), None, "")
+        Prepared(digraph, valid, LiveSolver.solve(digraph, valid, alt), None, "")
     }
+  }
 
   private def publishPrepared(prepared: Prepared): Unit = {
     showingSecond = false
@@ -278,7 +296,7 @@ class PathViewerFrame extends GraphViewerFrame() {
         setSummary(onePathStatus(request, path))
       case SolveResult.KPaths(solution) =>
         showKShortestPaths(solution, stream)
-        setSummary(f"Yen k=${solution.k} total ${solution.totalCost}%.4g")
+        setSummary(f"${request.algorithm} k=${solution.k} total ${solution.totalCost}%.4g")
     }
   }
 
@@ -309,9 +327,9 @@ class PathViewerFrame extends GraphViewerFrame() {
 
   private def onePathStatus(request: SolveRequest, path: Path): String =
     if (path.nodes.isEmpty || path.weight.isPosInfinity)
-      s"Modified: no path ${request.source} → ${request.target}"
+      s"${request.algorithm}: no path ${request.source} → ${request.target}"
     else
-      f"Modified ${request.source} → ${request.target}: ${path.weight}%.4g ${path.nodes.mkString(" ")}"
+      f"${request.algorithm} ${request.source} → ${request.target}: ${path.weight}%.4g ${path.nodes.mkString(" ")}"
 
   private def sourceVertex(solution: ShortestPathsSolution): Int =
     solution.paths.zipWithIndex.collectFirst {
@@ -354,7 +372,8 @@ class PathViewerFrame extends GraphViewerFrame() {
     val suffixes = Seq(
       s"_${ModifiedDijkstrasPathSolver.BASE_NAME}_solution",
       s"_${DijkstrasPathSolver.BASE_NAME}_solution",
-      s"_${YensKPathsSolver.BASE_NAME}_solution"
+      s"_${YensKPathsSolver.BASE_NAME}_solution",
+      s"_${EppsteinsKPathsSolver.BASE_NAME}_solution"
     )
     suffixes.map(fileName.indexOf).find(_ >= 0)
       .getOrElse(throw new IllegalArgumentException("Invalid fileName: " + fileName))

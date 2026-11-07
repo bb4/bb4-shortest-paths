@@ -16,6 +16,9 @@ class SolveBarSuite extends AnyFunSuite {
     bar.selectAlgorithm(Yen)
     assert(bar.kSpec._4)
 
+    bar.selectAlgorithm(Eppstein)
+    assert(bar.kSpec._4)
+
     bar.selectAlgorithm(Dijkstra)
     assert(!bar.kSpec._4)
 

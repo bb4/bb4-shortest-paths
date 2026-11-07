@@ -103,3 +103,24 @@ node.current {
   stroke-width: 3px;
   z-index: 15;
 }
+
+node.frontierBack {
+  fill-color: #c5ddff;
+  stroke-color: #3a6ea5;
+  stroke-width: 2px;
+}
+
+node.currentBack {
+  fill-color: #7eb6ff;
+  stroke-color: #1e4f8c;
+  stroke-width: 3px;
+  z-index: 15;
+}
+
+node.visitedBack {
+  size: 21px, 21px;
+  fill-color: #c5ddff;
+  stroke-color: #557799;
+  text-size: 14px;
+  text-color: #446688;
+}
