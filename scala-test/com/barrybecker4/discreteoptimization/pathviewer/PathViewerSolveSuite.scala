@@ -1,6 +1,7 @@
 package com.barrybecker4.discreteoptimization.pathviewer
 
 import com.barrybecker4.graph.directed.{DirectedEdge, DirectedGraph}
+import org.scalatest.Outcome
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.jdk.CollectionConverters.*
@@ -8,6 +9,15 @@ import scala.jdk.CollectionConverters.*
 class PathViewerSolveSuite extends AnyFunSuite {
 
   System.setProperty("org.graphstream.ui", "swing")
+
+  /** PathViewerFrame is a JFrame; skip when CI runs with -Djava.awt.headless=true. */
+  override def withFixture(test: NoArgTest): Outcome = {
+    assume(
+      !java.awt.GraphicsEnvironment.isHeadless,
+      "GUI test skipped in headless environment"
+    )
+    super.withFixture(test)
+  }
 
   private val triangle = DirectedGraph(
     3,
