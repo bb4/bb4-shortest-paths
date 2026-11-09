@@ -20,7 +20,7 @@ class BellmanFordPathSolver extends ShortestPathsSolver {
 
   /**
    * Paths from `sourceVertex` to every vertex.
-   * Throws [[IllegalStateException]] if a negative cycle is reachable from the source.
+   * Throws [[java.lang.IllegalStateException]] if a negative cycle is reachable from the source.
    */
   override def findPaths(graph: DirectedGraph, sourceVertex: Int): ShortestPathsSolution = {
     findPathsOrCycle(graph, sourceVertex) match {
