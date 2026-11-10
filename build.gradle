@@ -39,7 +39,7 @@ dependencies {
     implementation 'org.graphstream:gs-ui-swing:2.0'
 }
 
-tasks.named('scaladoc', org.gradle.api.tasks.scala.ScalaDoc) {
+tasks.named('scaladoc', ScalaDoc) {
     scalaDocOptions {
         additionalParameters = ['-nowarn']
     }
