@@ -1,6 +1,6 @@
 package com.barrybecker4.graph.visualization
 
-import com.barrybecker4.common.geometry.FloatLocation
+import com.barrybecker4.graph.geometry.FloatLocation
 import com.barrybecker4.graph.directed.DirectedGraph
 import com.barrybecker4.graph.visualization.GraphStreamAdapter.LARGE_GRAPH_THRESH
 import com.barrybecker4.graph.visualization.render.UiClass.*

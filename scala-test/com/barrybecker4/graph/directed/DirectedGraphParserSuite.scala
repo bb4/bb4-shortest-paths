@@ -1,6 +1,6 @@
 package com.barrybecker4.graph.directed
 
-import com.barrybecker4.common.geometry.FloatLocation
+import com.barrybecker4.graph.geometry.FloatLocation
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.io.Source

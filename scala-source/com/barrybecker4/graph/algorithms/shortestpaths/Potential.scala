@@ -1,6 +1,6 @@
 package com.barrybecker4.graph.algorithms.shortestpaths
 
-import com.barrybecker4.common.geometry.FloatLocation
+import com.barrybecker4.graph.geometry.FloatLocation
 import com.barrybecker4.graph.directed.DirectedGraph
 
 /** Lower bounds on remaining distance to a destination, used as A-star and ALT potentials. */

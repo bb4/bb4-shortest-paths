@@ -1,6 +1,6 @@
 package com.barrybecker4.discreteoptimization.traffic.viewer.adapter
 
-import com.barrybecker4.common.geometry.FloatLocation
+import com.barrybecker4.graph.geometry.FloatLocation
 import com.barrybecker4.discreteoptimization.traffic.graph.model.Intersection
 import com.barrybecker4.discreteoptimization.traffic.viewer.adapter.IntersectionSubGraphBuilder.{INTERSECTION_RADIUS, INTERSECTION_TYPE, LANE_SEP_ANGLE, VECTOR_SCALE}
 import com.barrybecker4.discreteoptimization.traffic.viewer.adapter.TrafficStreamAdapter.COMPUTE_CURVES

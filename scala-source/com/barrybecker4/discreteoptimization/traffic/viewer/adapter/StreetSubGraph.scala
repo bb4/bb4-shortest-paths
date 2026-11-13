@@ -1,6 +1,6 @@
 package com.barrybecker4.discreteoptimization.traffic.viewer.adapter
 
-import com.barrybecker4.common.geometry.FloatLocation
+import com.barrybecker4.graph.geometry.FloatLocation
 import com.barrybecker4.discreteoptimization.traffic.graph.model.{Intersection, Street}
 import org.graphstream.graph.{Edge, Node}
 import org.graphstream.graph.implementations.MultiGraph
