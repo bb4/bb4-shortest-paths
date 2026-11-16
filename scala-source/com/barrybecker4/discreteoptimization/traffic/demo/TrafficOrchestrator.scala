@@ -4,14 +4,10 @@ import org.graphstream.graph.Graph
 import org.graphstream.ui.view.{Viewer, ViewerPipe}
 import com.barrybecker4.graph.visualization.render.GraphViewerPipe
 import com.barrybecker4.discreteoptimization.traffic.vehicles.VehicleSpriteGenerator
-import com.barrybecker4.discreteoptimization.traffic.viewer.TrafficGraphGenerator
-import org.graphstream.graph.implementations.MultiGraph
 import com.barrybecker4.discreteoptimization.traffic.viewer.TrafficGraphUtil.sleep
 import com.barrybecker4.discreteoptimization.traffic.viewer.adapter.IntersectionSubGraph
 import com.barrybecker4.discreteoptimization.traffic.demo.TrafficOrchestrator.DELTA_TIME_SECS
 
-import java.awt.{Dimension, Frame}
-import javax.swing.JFrame
 
 object TrafficOrchestrator {
   private val DELTA_TIME_SECS = 0.02
