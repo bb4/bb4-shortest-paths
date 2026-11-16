@@ -1,6 +1,6 @@
 package com.barrybecker4.discreteoptimization.traffic.vehicles
 
-import com.barrybecker4.discreteoptimization.traffic.vehicles.VehicleSprite.{DEBUG, MAX_ACCELERATION, MAX_SPEED, PREFERRED_SPEED, RND}
+import com.barrybecker4.discreteoptimization.traffic.vehicles.VehicleSprite.{DEBUG, MAX_ACCELERATION, MAX_SPEED, PREFERRED_SPEED}
 import org.graphstream.graph.Edge
 import org.graphstream.graph.Node
 import org.graphstream.ui.spriteManager.Sprite

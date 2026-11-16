@@ -1,6 +1,6 @@
 package com.barrybecker4.discreteoptimization.shortestpaths
 
-import com.barrybecker4.graph.directed.{DirectedGraph, DirectedGraphParser}
+import com.barrybecker4.graph.directed.DirectedGraphParser
 import com.barrybecker4.discreteoptimization.shortestpaths.model.{ShortestPathsSolution, ShortestPathsSolutionParser}
 
 import java.io.{File, PrintWriter}

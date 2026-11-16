@@ -3,11 +3,8 @@ package com.barrybecker4.graph.visualization
 import com.barrybecker4.graph.GraphTstUtil
 import com.barrybecker4.graph.directed.{DirectedGraph, DirectedGraphParser}
 import com.barrybecker4.graph.visualization.GraphViewerFrame.{PARSER, PREFIX, VIEWER_LOCK}
-import com.barrybecker4.graph.visualization.{GraphStreamAdapter, GraphViewer}
 import org.graphstream.graph.Graph
-import org.graphstream.ui.layout.springbox.implementations.{LinLog, SpringBox}
-import org.graphstream.ui.swing_viewer.{SwingViewer, ViewPanel}
-import org.graphstream.ui.view.{View, Viewer}
+import org.graphstream.ui.layout.springbox.implementations.SpringBox
 
 import java.io.File
 import javax.swing.*

@@ -1,18 +1,10 @@
 package com.barrybecker4.discreteoptimization.traffic.viewer.adapter
 
-import com.barrybecker4.common.format.FormatUtil
-import com.barrybecker4.graph.geometry.FloatLocation
 import com.barrybecker4.discreteoptimization.traffic.graph.model.Intersection
 import com.barrybecker4.discreteoptimization.traffic.signals.TrafficSignal
 import com.barrybecker4.discreteoptimization.traffic.vehicles.{VehicleSprite, VehicleSpriteManager}
-import com.barrybecker4.discreteoptimization.traffic.viewer.adapter.IntersectionSubGraphBuilder
 import org.graphstream.graph.{Edge, Node}
 import org.graphstream.graph.implementations.MultiGraph
-import com.barrybecker4.discreteoptimization.traffic.signals.SignalState.*
-import com.barrybecker4.discreteoptimization.traffic.vehicles.VehicleSprite.DEBUG
-import com.barrybecker4.common.format.FormatUtil.formatNumber
-
-import scala.collection.mutable
 
 
 /**

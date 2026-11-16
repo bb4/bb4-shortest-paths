@@ -1,31 +1,17 @@
 package com.barrybecker4.discreteoptimization.traffic.viewer
 
-import com.barrybecker4.graph.Path
-import com.barrybecker4.graph.directed.{DirectedEdge, DirectedGraphParser}
 import TrafficViewerFrame.{PARSER, SUFFIX, TRAFFIC_GRAPHS_PREFIX}
-import com.barrybecker4.graph.visualization.render.GraphViewerPipe
-import com.barrybecker4.graph.visualization.{GraphStreamAdapter, GraphViewer, GraphViewerFrame}
-import com.barrybecker4.discreteoptimization.kshortestpaths.KShortestPathsTstUtil
-import com.barrybecker4.discreteoptimization.kshortestpaths.model.KShortestPathsSolution
-import com.barrybecker4.discreteoptimization.kshortestpaths.solver.YensKPathsSolver
-import com.barrybecker4.discreteoptimization.pathviewer.PathViewerFrame.*
-import com.barrybecker4.discreteoptimization.shortestpaths.ShortestPathsTstUtil
-import com.barrybecker4.discreteoptimization.shortestpaths.model.ShortestPathsSolution
-import com.barrybecker4.discreteoptimization.shortestpaths.solver.{DijkstrasPathSolver, ModifiedDijkstrasPathSolver}
+import com.barrybecker4.graph.visualization.{GraphViewer, GraphViewerFrame}
 import com.barrybecker4.discreteoptimization.traffic.demo.TrafficOrchestrator
 import com.barrybecker4.discreteoptimization.traffic.viewer.adapter.{IntersectionSubGraph, TrafficStreamAdapter}
 import com.barrybecker4.discreteoptimization.traffic.graph.{TrafficGraph, TrafficGraphParser}
-import org.graphstream.graph.implementations.MultiGraph
-import org.graphstream.graph.{Edge, Graph, Node}
-import org.graphstream.ui.layout.springbox.implementations.{LinLog, SpringBox}
-import org.graphstream.ui.swing_viewer.{SwingViewer, ViewPanel}
-import org.graphstream.ui.view.{View, Viewer, ViewerListener, ViewerPipe}
+import org.graphstream.graph.Graph
+import org.graphstream.ui.layout.springbox.implementations.SpringBox
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import java.awt.{BorderLayout, Color}
+import java.awt.BorderLayout
 import java.io.File
 import javax.swing.*
-import scala.annotation.Annotation
 import scala.concurrent.Future
 import scala.io.Source
 

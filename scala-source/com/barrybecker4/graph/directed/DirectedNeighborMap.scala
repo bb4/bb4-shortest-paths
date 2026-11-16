@@ -1,6 +1,7 @@
 package com.barrybecker4.graph.directed
 
 import scala.collection.mutable.ArrayBuffer
+import scala.compiletime.uninitialized
 
 /**
  * Edges incident to each vertex, stored in an array indexed by vertex id.
@@ -10,7 +11,7 @@ import scala.collection.mutable.ArrayBuffer
 class DirectedNeighborMap(numVertices: Int) {
 
   private val buffers = Array.fill(numVertices)(ArrayBuffer.empty[DirectedEdge])
-  private var neighbors: Array[IndexedSeq[DirectedEdge]] = _
+  private var neighbors: Array[IndexedSeq[DirectedEdge]] = uninitialized
 
   def apply(v: Int): IndexedSeq[DirectedEdge] = neighbors(v)
 

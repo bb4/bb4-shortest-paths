@@ -1,9 +1,8 @@
 package com.barrybecker4.graph.visualization.render
 
-import org.graphstream.stream.{ProxyPipe, SourceBase}
+import org.graphstream.stream.ProxyPipe
 import org.graphstream.ui.view.ViewerPipe
 
-import java.util
 import scala.jdk.CollectionConverters.*
 
 

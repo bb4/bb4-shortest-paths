@@ -1,11 +1,8 @@
 package com.barrybecker4.graph.visualization.render
 
 import org.graphstream.ui.geom.Point3
-import org.graphstream.ui.graphicGraph.stylesheet.{Style, Values}
-import org.graphstream.ui.graphicGraph.{GraphicEdge, GraphicElement, GraphicGraph, GraphicNode}
+import org.graphstream.ui.graphicGraph.{GraphicEdge, GraphicElement, GraphicGraph}
 import org.graphstream.ui.view.camera.DefaultCamera2D
-
-import java.awt.geom.Point2D
 
 class GraphCamera2D(graphicGraph: GraphicGraph) extends DefaultCamera2D(graphicGraph) {
 

@@ -1,11 +1,9 @@
 package com.barrybecker4.graph.visualization.demos
 
-import com.barrybecker4.graph.visualization.demos.GraphExploreExample
 import com.barrybecker4.graph.visualization.demos.GraphExploreExample.STYLE_SHEET
 import org.graphstream.graph.*
 import org.graphstream.graph.implementations.*
 
-import java.util
 import scala.jdk.CollectionConverters.*
 
 

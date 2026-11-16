@@ -6,7 +6,6 @@ import com.barrybecker4.discreteoptimization.traffic.viewer.TrafficGraphUtil
 import org.graphstream.graph.Edge
 import org.graphstream.graph.Graph
 import org.graphstream.ui.spriteManager.Sprite
-import org.graphstream.ui.spriteManager.SpriteManager
 
 import java.util.concurrent.atomic.AtomicInteger
 import scala.util.Random

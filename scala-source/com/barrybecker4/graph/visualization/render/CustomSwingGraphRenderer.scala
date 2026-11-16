@@ -1,9 +1,7 @@
 package com.barrybecker4.graph.visualization.render
 
-import com.barrybecker4.graph.visualization.render.GraphCamera2D
 import org.graphstream.ui.graphicGraph.GraphicGraph
 import org.graphstream.ui.swing.{BackendJ2D, SwingGraphRenderer}
-import org.graphstream.ui.view.camera.DefaultCamera2D
 
 import java.awt.Container
 

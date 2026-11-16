@@ -1,6 +1,5 @@
 package com.barrybecker4.graph.visualization.demos
 
-import org.graphstream.graph.*
 import org.graphstream.graph.implementations.*
 
 

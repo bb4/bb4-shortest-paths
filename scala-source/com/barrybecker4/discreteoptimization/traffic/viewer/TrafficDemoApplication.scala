@@ -1,6 +1,5 @@
 package com.barrybecker4.discreteoptimization.traffic.viewer
 
-import com.barrybecker4.graph.visualization.render.GraphViewerPipe
 import com.barrybecker4.discreteoptimization.traffic.demo.TrafficOrchestrator
 
 

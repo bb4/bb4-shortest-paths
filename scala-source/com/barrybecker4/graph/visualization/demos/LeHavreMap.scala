@@ -1,8 +1,6 @@
 package com.barrybecker4.graph.visualization.demos
 
-import com.barrybecker4.graph.visualization.demos.LeHavreMap
 import com.barrybecker4.graph.visualization.demos.LeHavreMap.{PATH_PREFIX, STYLE_SHEET}
-import org.graphstream.graph.*
 import org.graphstream.graph.implementations.*
 import org.graphstream.ui.swing_viewer.ViewPanel
 import org.graphstream.ui.view.Viewer

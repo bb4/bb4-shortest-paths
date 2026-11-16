@@ -7,7 +7,7 @@ import org.graphstream.graph.{Edge, Graph}
 import java.awt.BorderLayout
 import java.util.concurrent.{Executors, ScheduledExecutorService, TimeUnit}
 import javax.swing.{JPanel, JTable}
-import javax.swing.table.{AbstractTableModel, TableColumn, TableColumnModel}
+import javax.swing.table.{AbstractTableModel, TableColumn}
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
 
