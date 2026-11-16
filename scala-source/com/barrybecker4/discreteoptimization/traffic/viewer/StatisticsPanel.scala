@@ -4,11 +4,9 @@ import com.barrybecker4.common.format.FormatUtil
 import com.barrybecker4.discreteoptimization.traffic.vehicles.{VehicleSprite, VehicleStatistics}
 import org.graphstream.graph.{Edge, Graph}
 
-import java.awt.{BorderLayout, Dimension, FlowLayout}
-import java.util
+import java.awt.BorderLayout
 import java.util.concurrent.{Executors, ScheduledExecutorService, TimeUnit}
-import javax.swing.event.TableColumnModelListener
-import javax.swing.{JLabel, JPanel, JTable, ListSelectionModel}
+import javax.swing.{JPanel, JTable}
 import javax.swing.table.{AbstractTableModel, TableColumn, TableColumnModel}
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.*

@@ -5,9 +5,7 @@ import com.barrybecker4.discreteoptimization.traffic.signals.SignalState.*
 
 import java.util.concurrent.{Executors, TimeUnit}
 import concurrent.duration.DurationInt
-import com.barrybecker4.discreteoptimization.traffic.signals.DumbTrafficSignal.*
 import com.barrybecker4.discreteoptimization.traffic.vehicles.VehicleSprite
-import org.graphstream.graph.Node
 
 
 /**

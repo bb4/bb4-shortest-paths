@@ -1,7 +1,7 @@
 package com.barrybecker4.discreteoptimization.traffic.vehicles
 
 import org.graphstream.ui.graphicGraph.stylesheet.Values
-import org.graphstream.ui.spriteManager.{Sprite, SpriteFactory, SpriteManager}
+import org.graphstream.ui.spriteManager.{SpriteFactory, SpriteManager}
 import com.barrybecker4.discreteoptimization.traffic.vehicles.VehicleSpriteManager
 
 

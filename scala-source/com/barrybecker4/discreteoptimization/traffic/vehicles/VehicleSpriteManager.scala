@@ -3,9 +3,7 @@ package com.barrybecker4.discreteoptimization.traffic.vehicles
 import org.graphstream.graph.{Edge, Graph}
 import org.graphstream.ui.spriteManager.SpriteManager
 
-import java.util.stream.Collectors
 import scala.collection.mutable
-import scala.jdk.CollectionConverters.*
 
 
 class VehicleSpriteManager(graph: Graph) extends SpriteManager(graph) {
